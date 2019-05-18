@@ -9,9 +9,9 @@ import org.gradle.api.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import java.io.*
 
-class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = false)
-class KorlibsPluginNoNative : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = true)
-class KorlibsPlugin : BaseKorlibsPlugin(nativeEnabled = true, androidEnabled = true)
+open class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = false)
+open class KorlibsPluginNoNative : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = true)
+open class KorlibsPlugin : BaseKorlibsPlugin(nativeEnabled = true, androidEnabled = true)
 
 open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boolean) : Plugin<Project> {
     override fun apply(project: Project) = project {

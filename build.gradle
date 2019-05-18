@@ -9,11 +9,15 @@ buildscript {
 
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.3.31"
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '0.10.1'
 }
 
-apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+
+group = "com.soywiz.korlibs"
+version = "0.0.1"
 
 repositories {
     mavenLocal()
@@ -29,6 +33,24 @@ dependencies {
     implementation("com.android.tools.build:gradle:3.4.1")
     compile gradleApi()
     compile localGroovy()
+}
+
+
+pluginBundle {
+    website = "https://github.com/korlibs/easy-kotlin-mpp-gradle-plugin"
+    vcsUrl = "https://github.com/korlibs/easy-kotlin-mpp-gradle-plugin"
+    tags = ["korlibs", "kotlin", "kotlin-mpp"]
+}
+
+gradlePlugin {
+    plugins {
+        easyKotlinMppGradlePlugin {
+            id = 'com.soywiz.korlibs.easy-kotlin-mpp-gradle-plugin'
+            displayName = 'easy-kotlin-mpp-gradle-plugin'
+            description = 'Allows to build Kotlin MPP projects easily'
+            implementationClass = 'com.soywiz.korlibs.KorlibsPlugin'
+        }
+    }
 }
 
 publishing {
