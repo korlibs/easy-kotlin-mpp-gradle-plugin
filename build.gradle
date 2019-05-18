@@ -9,15 +9,13 @@ buildscript {
 
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.3.31"
-    id 'java-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '0.10.1'
+    id "java-gradle-plugin"
+    id "com.gradle.plugin-publish" version "0.10.1"
+    //id "com.jfrog.bintray" version "1.8.4"
 }
 
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-
-group = "com.soywiz.korlibs"
-version = "0.0.1"
 
 repositories {
     mavenLocal()
@@ -53,14 +51,47 @@ gradlePlugin {
     }
 }
 
+def publishUser = (rootProject.findProperty("BINTRAY_USER") ?: project.findProperty("bintrayUser") ?: System.getenv("BINTRAY_USER"))?.toString()
+def publishPassword = (rootProject.findProperty("BINTRAY_KEY") ?: project.findProperty("bintrayApiKey") ?: System.getenv("BINTRAY_API_KEY"))?.toString()
+
+if (publishUser == null || publishPassword == null) {
+    println("Required BINTRAY_USER and BINTRAY_KEY in ~/.gradle/gradle.properties")
+}
+
 publishing {
+    repositories {
+        maven {
+            credentials {
+                username = publishUser
+                password = publishPassword
+            }
+            url = uri("https://api.bintray.com/maven/korlibs/korlibs/${project.property("project.repository")}/")
+        }
+    }
     publications {
         maven(MavenPublication) {
-            groupId = "com.soywiz.korlibs"
-            artifactId = "easy-kotlin-mpp-gradle-plugin"
+            groupId = project.group
+            artifactId = project.name
             version = project.version
 
             from components.java
+
+            maven(MavenPublication) {
+                pom {
+                    name = project.name
+                    description = project.property("project.description")
+                    url = project.property("project.scm.url")
+                    licenses {
+                        license {
+                            name = project.property("project.license.name")
+                            url = project.property("project.license.url")
+                        }
+                    }
+                    scm {
+                        url = project.property("project.scm.url")
+                    }
+                }
+            }
         }
     }
 }
