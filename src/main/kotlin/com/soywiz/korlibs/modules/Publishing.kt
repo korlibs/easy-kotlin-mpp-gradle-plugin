@@ -24,7 +24,7 @@ fun Project.configurePublishing() {
                         it.username = publishUser
                         it.setPassword(publishPassword)
                     }
-                    it.url = uri("https://api.bintray.com/maven/soywiz/soywiz/${project.property("project.package")}/")
+                    it.url = uri("https://api.bintray.com/maven/${project.property("project.bintray.org")}/${project.property("project.bintray.repository")}/${project.property("project.bintray.package")}/")
                 }
             }
             afterEvaluate {

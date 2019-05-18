@@ -65,7 +65,7 @@ publishing {
                 username = publishUser
                 password = publishPassword
             }
-            url = uri("https://api.bintray.com/maven/korlibs/korlibs/${project.property("project.repository")}/")
+            url = uri("https://api.bintray.com/maven/${project.property("project.bintray.org")}/${project.property("project.bintray.repository")}/${project.property("project.bintray.package")}/")
         }
     }
     publications {
