@@ -1,12 +1,15 @@
 package com.soywiz.korlibs.modules
 
+import com.soywiz.korlibs.create
+import com.soywiz.korlibs.gkotlin
 import com.soywiz.korlibs.korlibs
-import com.soywiz.korlibs.toXmlString
 import groovy.util.*
 import groovy.xml.*
 import org.gradle.api.*
 import org.gradle.api.publish.*
 import org.gradle.api.publish.maven.*
+import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 fun Project.configurePublishing() {
     // Publishing
@@ -14,6 +17,10 @@ fun Project.configurePublishing() {
     val publishPassword = (rootProject.findProperty("BINTRAY_KEY") ?: project.findProperty("bintrayApiKey") ?: System.getenv("BINTRAY_API_KEY"))?.toString()
 
     plugins.apply("maven-publish")
+
+    val javadocJar = tasks.create<Jar>("javadocJar") {
+        classifier = "javadoc"
+    }
 
     if (publishUser != null && publishPassword != null) {
         val publishing = extensions.getByType(PublishingExtension::class.java)
@@ -28,8 +35,45 @@ fun Project.configurePublishing() {
                 }
             }
             afterEvaluate {
-                configure(publications) {
-                    val publication = it as MavenPublication
+                //println(gkotlin.sourceSets.names)
+
+                publications.withType(MavenPublication::class.java) { publication ->
+                    println("Publication: $publication : ${publication.name} : ${publication.artifactId}")
+
+                    /*
+                    val sourcesJar = tasks.create<Jar>("sourcesJar${publication.name.capitalize()}") {
+                        classifier = "sources"
+                        baseName = publication.name
+                        val pname = when (publication.name) {
+                            "metadata" -> "common"
+                            else -> publication.name
+                        }
+                        val names = listOf("${pname}Main", pname)
+                        val sourceSet = names.mapNotNull { gkotlin.sourceSets.findByName(it) }.firstOrNull() as? KotlinSourceSet
+
+                        sourceSet?.let { from(it.kotlin) }
+                        //println("${publication.name} : ${sourceSet?.javaClass}")
+
+                        /*
+                        doFirst {
+                            println(gkotlin.sourceSets)
+                            println(gkotlin.sourceSets.names)
+                            println(gkotlin.sourceSets.getByName("main"))
+                            //from(sourceSets.main.allSource)
+                        }
+                        afterEvaluate {
+                            println(gkotlin.sourceSets.names)
+                        }
+                         */
+                    }
+                    */
+
+                    val mustIncludeDocs = publication.name != "kotlinMultiplatform"
+
+                    //if (publication.name == "")
+                    if (mustIncludeDocs) {
+                        publication.artifact(javadocJar)
+                    }
                     publication.pom.withXml {
                         it.asNode().apply {
                             appendNode("name", project.name)

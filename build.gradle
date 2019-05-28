@@ -87,20 +87,18 @@ publishing {
             artifact(sourcesJar)
             artifact(javadocJar)
 
-            maven(MavenPublication) {
-                pom {
-                    name = project.name
-                    description = project.property("project.description")
+            pom {
+                name = project.name
+                description = project.property("project.description")
+                url = project.property("project.scm.url")
+                licenses {
+                    license {
+                        name = project.property("project.license.name")
+                        url = project.property("project.license.url")
+                    }
+                }
+                scm {
                     url = project.property("project.scm.url")
-                    licenses {
-                        license {
-                            name = project.property("project.license.name")
-                            url = project.property("project.license.url")
-                        }
-                    }
-                    scm {
-                        url = project.property("project.scm.url")
-                    }
                 }
             }
         }

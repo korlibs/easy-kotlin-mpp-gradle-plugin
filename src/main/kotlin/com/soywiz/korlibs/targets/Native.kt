@@ -4,16 +4,37 @@ import com.soywiz.korlibs.*
 import org.apache.tools.ant.taskdefs.condition.*
 import org.gradle.api.*
 import org.gradle.api.tasks.*
+import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinTarget
 import java.io.*
 
 fun Project.configureTargetNative() {
+    val nativeExtraJar = tasks.create<Jar>("nativeExtraJar") {
+    }
+
+    fun AbstractKotlinTarget.extraNative() {
+        mavenPublication(Action { it.artifact(nativeExtraJar) })
+    }
+
     gkotlin.apply {
-        iosX64()
-        iosArm32()
-        iosArm64()
-        macosX64()
-        linuxX64()
-        mingwX64()
+        iosX64() {
+            extraNative()
+        }
+        iosArm32() {
+            extraNative()
+        }
+        iosArm64() {
+            extraNative()
+        }
+        macosX64() {
+            extraNative()
+        }
+        linuxX64() {
+            extraNative()
+        }
+        mingwX64() {
+            extraNative()
+        }
 
         if (System.getProperty("idea.version") != null) {
             when {

@@ -10,6 +10,7 @@ import org.gradle.api.tasks.*
 import org.gradle.api.tasks.bundling.*
 import org.gradle.api.tasks.testing.*
 import java.io.*
+import javax.swing.Action
 
 fun Project.configureTargetJavaScript() {
     gkotlin.apply {
@@ -22,6 +23,9 @@ fun Project.configureTargetJavaScript() {
                     moduleKind = "umd"
                 }
             }
+            mavenPublication(Action { publication ->
+                //println("JS publication: $publication : ${publication.name}")
+            })
         }
     }
 
