@@ -38,7 +38,7 @@ fun Project.configurePublishing() {
                 //println(gkotlin.sourceSets.names)
 
                 publications.withType(MavenPublication::class.java) { publication ->
-                    println("Publication: $publication : ${publication.name} : ${publication.artifactId}")
+                    //println("Publication: $publication : ${publication.name} : ${publication.artifactId}")
 
                     /*
                     val sourcesJar = tasks.create<Jar>("sourcesJar${publication.name.capitalize()}") {
