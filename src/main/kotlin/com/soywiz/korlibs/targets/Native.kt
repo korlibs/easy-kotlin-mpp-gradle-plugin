@@ -6,6 +6,8 @@ import org.gradle.api.*
 import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinTarget
+import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
+import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 import java.io.*
 
 fun Project.configureTargetNative() {
@@ -80,9 +82,9 @@ fun Project.configureTargetNative() {
     afterEvaluate {
         for (target in korlibs.DESKTOP_NATIVE_TARGETS) {
             val taskName = "copyResourcesToExecutable_$target"
-            val targetTestTask = tasks.getByName("${target}Test") as Exec
+            val targetTestTask = tasks.getByName("${target}Test") as KotlinNativeTest
             val compileTestTask = tasks.getByName("compileTestKotlin${target.capitalize()}")
-            val compileMainask = tasks.getByName("compileKotlin${target.capitalize()}")
+            val compileMainTask = tasks.getByName("compileKotlin${target.capitalize()}")
 
             tasks {
                 create<Copy>(taskName) {
@@ -90,22 +92,14 @@ fun Project.configureTargetNative() {
                         from(sourceSet.resources)
                     }
 
-                    into(File(targetTestTask.executable).parentFile)
+                    into(targetTestTask.executable.parentFile)
                 }
-            }
-
-            val reportFile = buildDir["test-results/nativeTest/text/output.txt"].apply { parentFile.mkdirs() }
-            val fout = ByteArrayOutputStream()
-            targetTestTask.standardOutput = MultiOutputStream(listOf(targetTestTask.standardOutput, fout))
-            targetTestTask.doLast {
-                reportFile.writeBytes(fout.toByteArray())
             }
 
             targetTestTask.inputs.files(
                 *compileTestTask.outputs.files.files.toTypedArray(),
-                *compileMainask.outputs.files.files.toTypedArray()
+                *compileMainTask.outputs.files.files.toTypedArray()
             )
-            targetTestTask.outputs.file(reportFile)
 
             targetTestTask.dependsOn(taskName)
         }
