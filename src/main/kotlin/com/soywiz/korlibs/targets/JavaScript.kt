@@ -19,12 +19,12 @@ fun Project.configureTargetJavaScript() {
             })
             browser {
                 testTask {
-                    useMocha()
+                    //useMocha() // @TODO: Seems to produce problems where the JS file is produced and consumed
                 }
             }
             nodejs {
                 testTask {
-                    useMocha()
+                    //useMocha() // @TODO: Seems to produce problems where the JS file is produced and consumed
                 }
             }
         }
