@@ -1,5 +1,6 @@
 package com.soywiz.korlibs.modules
 
+import com.soywiz.korlibs.korlibs
 import org.gradle.api.*
 
 fun Project.configureKorlibsRepos() {
@@ -10,6 +11,11 @@ fun Project.configureKorlibsRepos() {
                     it.excludeGroup("Kotlin/Native")
                 }
             }
+			if (korlibs.isKotlinDev) {
+				maven {
+					it.url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
+				}
+			}
             maven {
                 //it.url = uri("https://dl.bintray.com/soywiz/soywiz")
                 it.url = uri("https://dl.bintray.com/korlibs/korlibs")

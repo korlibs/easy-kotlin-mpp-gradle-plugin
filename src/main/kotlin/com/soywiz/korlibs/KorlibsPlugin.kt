@@ -17,6 +17,11 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
 
         plugins.apply("kotlin-multiplatform")
 
+		//println("KotlinVersion.CURRENT: ${KotlinVersion.CURRENT}")
+		//println("KORLIBS_KOTLIN_VERSION: $KORLIBS_KOTLIN_VERSION")
+
+		//project.setProperty("KORLIBS_KOTLIN_VERSION", KORLIBS_KOTLIN_VERSION)
+
         configureKorlibsRepos()
 
         // Platforms
@@ -57,7 +62,9 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
         }
     }
 
-    val LINUX_DESKTOP_NATIVE_TARGETS = listOf("linuxX64")
+	val KORLIBS_KOTLIN_VERSION get() = com.soywiz.korlibs.KORLIBS_KOTLIN_VERSION
+	val isKotlinDev get() = KORLIBS_KOTLIN_VERSION.contains("-release")
+	val LINUX_DESKTOP_NATIVE_TARGETS = listOf("linuxX64")
     val MACOS_DESKTOP_NATIVE_TARGETS = listOf("macosX64")
     //val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64", "mingwX86")
     val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64")

@@ -22,7 +22,14 @@ fun Project.configurePublishing() {
         classifier = "javadoc"
     }
 
-    if (publishUser != null && publishPassword != null) {
+	val sourcesJar = tasks.create<Jar>("sourceJar") {
+		classifier = "sources"
+	}
+
+	val emptyJar = tasks.create<Jar>("emptyJar") {
+	}
+
+	if (publishUser != null && publishPassword != null) {
         val publishing = extensions.getByType(PublishingExtension::class.java)
         publishing.apply {
             repositories {
@@ -39,6 +46,12 @@ fun Project.configurePublishing() {
 
                 publications.withType(MavenPublication::class.java) { publication ->
                     //println("Publication: $publication : ${publication.name} : ${publication.artifactId}")
+					if (publication.name == "kotlinMultiplatform") {
+						publication.artifact(sourcesJar) {
+						}
+						publication.artifact(emptyJar) {
+						}
+					}
 
                     /*
                     val sourcesJar = tasks.create<Jar>("sourcesJar${publication.name.capitalize()}") {
@@ -68,7 +81,8 @@ fun Project.configurePublishing() {
                     }
                     */
 
-                    val mustIncludeDocs = publication.name != "kotlinMultiplatform"
+                    //val mustIncludeDocs = publication.name != "kotlinMultiplatform"
+					val mustIncludeDocs = true
 
                     //if (publication.name == "")
                     if (mustIncludeDocs) {
