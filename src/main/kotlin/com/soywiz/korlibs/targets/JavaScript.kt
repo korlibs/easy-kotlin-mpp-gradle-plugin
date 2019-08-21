@@ -2,10 +2,12 @@ package com.soywiz.korlibs.targets
 
 import com.soywiz.korlibs.*
 import org.gradle.api.*
+import org.jetbrains.kotlin.gradle.plugin.*
 
 fun Project.configureTargetJavaScript() {
     gkotlin.apply {
         js {
+			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
             compilations.all {
                 it.kotlinOptions.apply {
                     languageVersion = "1.3"

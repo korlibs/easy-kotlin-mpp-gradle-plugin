@@ -5,6 +5,7 @@ import org.apache.tools.ant.taskdefs.condition.*
 import org.gradle.api.*
 import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinTarget
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
 import org.jetbrains.kotlin.gradle.tasks.KotlinTest
@@ -16,6 +17,7 @@ fun Project.configureTargetNative() {
 
     fun AbstractKotlinTarget.extraNative() {
         mavenPublication(Action { it.artifact(nativeExtraJar) })
+		this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
     }
 
     gkotlin.apply {

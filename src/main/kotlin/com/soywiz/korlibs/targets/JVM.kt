@@ -4,10 +4,13 @@ import com.soywiz.korlibs.*
 import org.gradle.api.*
 import org.gradle.api.tasks.testing.*
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.kotlin.gradle.plugin.*
 
 fun Project.configureTargetJVM() {
     gkotlin.apply {
-        jvm()
+        jvm {
+			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
+		}
     }
 
     dependencies.apply {
