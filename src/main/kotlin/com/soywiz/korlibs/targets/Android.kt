@@ -16,7 +16,8 @@ fun Project.configureTargetAndroid() {
 
         gkotlin.apply {
             android {
-                publishLibraryVariants("release", "debug")
+                //publishLibraryVariants("release", "debug")
+				publishAllLibraryVariants()
             }
         }
 
