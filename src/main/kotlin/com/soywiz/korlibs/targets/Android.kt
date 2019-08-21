@@ -25,11 +25,11 @@ fun Project.configureTargetAndroid() {
             }
         }
 
-        //dependencies {
-        //    add("androidMainImplementation", "org.jetbrains.kotlin:kotlin-stdlib")
-        //    add("androidTestImplementation", "org.jetbrains.kotlin:kotlin-test")
-        //    add("androidTestImplementation", "org.jetbrains.kotlin:kotlin-test-junit")
-        //}
+        dependencies {
+            add("androidMainImplementation", "org.jetbrains.kotlin:kotlin-stdlib")
+            add("androidTestImplementation", "org.jetbrains.kotlin:kotlin-test")
+            add("androidTestImplementation", "org.jetbrains.kotlin:kotlin-test-junit")
+        }
 
 		configurations.apply {
 			//smokeTest.extendsFrom testImplementation
