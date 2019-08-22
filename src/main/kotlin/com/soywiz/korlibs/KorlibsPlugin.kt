@@ -43,16 +43,20 @@ val globalKorlibsDir: File by lazy { File(System.getProperty("user.home"), ".kor
 class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val androidEnabled: Boolean) {
     val korlibsDir: File get() = globalKorlibsDir
     //init { println("KorlibsExtension:${project.name},nativeEnabled=$nativeEnabled,androidEnabled=$androidEnabled") }
-    var hasAndroid = androidEnabled && ((System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null))
+	val prop_sdk_dir = System.getProperty("sdk.dir")
+	val prop_ANDROID_HOME = System.getenv("ANDROID_HOME")
+    var hasAndroid = androidEnabled && ((prop_sdk_dir != null) || (prop_ANDROID_HOME != null))
+	val tryAndroidSdkDir = File(System.getProperty("user.home"), "/Library/Android/sdk")
 
     init {
         if (!hasAndroid && androidEnabled) {
-            val trySdkDir = File(System.getProperty("user.home") + "/Library/Android/sdk")
-            if (trySdkDir.exists()) {
-                File(project.rootDir, "local.properties").writeText("sdk.dir=${trySdkDir.absolutePath}")
+            if (tryAndroidSdkDir.exists()) {
+                File(project.rootDir, "local.properties").writeText("sdk.dir=${tryAndroidSdkDir.absolutePath}")
                 hasAndroid = true
             }
         }
+
+		project.logger.info("hasAndroid: $hasAndroid, sdk.dir=$prop_sdk_dir, ANDROID_HOME=$prop_ANDROID_HOME, tryAndroidSdkDir=$tryAndroidSdkDir (${tryAndroidSdkDir.exists()})")
     }
 
     fun dependencyProject(name: String) = project {
