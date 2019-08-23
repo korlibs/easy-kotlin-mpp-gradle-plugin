@@ -35,6 +35,7 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
 
         // Publishing
         configurePublishing()
+		configureBintrayTools()
     }
 }
 
