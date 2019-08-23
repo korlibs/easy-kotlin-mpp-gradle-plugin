@@ -2,6 +2,7 @@ package com.soywiz.korlibs.modules
 
 import org.apache.tools.ant.taskdefs.condition.*
 import org.gradle.api.*
+import java.io.*
 import java.net.*
 import java.util.*
 
@@ -40,16 +41,18 @@ fun Project.configureBintrayTools() {
 	}
 
 	tasks.create("localPublishToBintrayIfRequired") {
-		if (project.version.toString().contains("-SNAPSHOT")) {
-			println("NOT Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
-		} else {
-			println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
-			project.exec {
-				it.workingDir(rootDir)
-				if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-					it.setCommandLine("./gradlew", "publishMingwX64PublicationToMavenRepository")
-				} else {
-					it.setCommandLine("./gradlew", "publish")
+		it.doLast {
+			if (project.version.toString().contains("-SNAPSHOT")) {
+				println("NOT Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+			} else {
+				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+				project.exec {
+					it.workingDir(rootDir)
+					if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+						it.setCommandLine("call", "/c", "gradlew.bat", "publishMingwX64PublicationToMavenRepository")
+					} else {
+						it.setCommandLine(File(rootDir, "gradlew").absolutePath, "publish")
+					}
 				}
 			}
 		}
@@ -63,11 +66,11 @@ fun Project.configureBintrayTools() {
 				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
 				project.exec {
 					it.workingDir(rootDir)
-					it.setCommandLine("./gradlew", "publish")
+					it.setCommandLine(File(rootDir, "gradlew").absolutePath, "publish")
 				}
 				project.exec {
 					it.workingDir(rootDir)
-					it.setCommandLine("./gradlew_win", "publishMingwX64PublicationToMavenRepository")
+					it.setCommandLine(File(rootDir, "gradlew_win").absolutePath, "publishMingwX64PublicationToMavenRepository")
 				}
 				actuallyPublishBintray()
 				println("Done")
