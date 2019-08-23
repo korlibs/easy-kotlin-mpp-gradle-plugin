@@ -39,21 +39,22 @@ fun Project.configureBintrayTools() {
 	}
 
 	tasks.create("dockerMultiPublishToBintray") {
-		it.onlyIf {
-			!project.version.toString().contains("-SNAPSHOT")
-		}
 		it.doLast {
-			println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
-			project.exec {
-				it.workingDir(rootDir)
-				it.setCommandLine("./gradlew", "publish")
+			if (project.version.toString().contains("-SNAPSHOT")) {
+				println("NOT Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+			} else {
+				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+				project.exec {
+					it.workingDir(rootDir)
+					it.setCommandLine("./gradlew", "publish")
+				}
+				project.exec {
+					it.workingDir(rootDir)
+					it.setCommandLine("./gradlew_win", "publishMingwX64PublicationToMavenRepository")
+				}
+				actuallyPublishBintray()
+				println("Done")
 			}
-			project.exec {
-				it.workingDir(rootDir)
-				it.setCommandLine("./gradlew_win", "publishMingwX64PublicationToMavenRepository")
-			}
-			actuallyPublishBintray()
-			println("Done")
 		}
 	}
 }
