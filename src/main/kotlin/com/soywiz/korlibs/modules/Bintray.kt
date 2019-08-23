@@ -1,5 +1,6 @@
 package com.soywiz.korlibs.modules
 
+import org.apache.tools.ant.taskdefs.condition.*
 import org.gradle.api.*
 import java.net.*
 import java.util.*
@@ -35,6 +36,22 @@ fun Project.configureBintrayTools() {
 	tasks.create("actuallyPublishBintray") {
 		it.doLast {
 			actuallyPublishBintray()
+		}
+	}
+
+	tasks.create("localPublishToBintrayIfRequired") {
+		if (project.version.toString().contains("-SNAPSHOT")) {
+			println("NOT Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+		} else {
+			println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+			project.exec {
+				it.workingDir(rootDir)
+				if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+					it.setCommandLine("./gradlew", "publishMingwX64PublicationToMavenRepository")
+				} else {
+					it.setCommandLine("./gradlew", "publish")
+				}
+			}
 		}
 	}
 
