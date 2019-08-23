@@ -6,6 +6,8 @@ import java.io.*
 import java.net.*
 import java.util.*
 
+val Project.isSnapshotVersion get() = version.toString().contains("-SNAPSHOT")
+
 fun Project.configureBintrayTools() {
 	val projectBintrayOrg by lazy { findProperty("project.bintray.org")?.toString() ?: error("Can't find project.bintray.org") }
 	val projectBintrayRepository by lazy { findProperty("project.bintray.repository")?.toString() ?: error("Can't find project.bintray.repository") }
@@ -34,32 +36,33 @@ fun Project.configureBintrayTools() {
 		)
 	}
 
-	tasks.create("actuallyPublishBintray") {
-		it.doLast {
+	tasks.create("actuallyPublishBintray") { task ->
+		task.doLast {
 			actuallyPublishBintray()
 		}
 	}
 
-	tasks.create("localPublishToBintrayIfRequired") {
-		it.doLast {
-			if (project.version.toString().contains("-SNAPSHOT")) {
+	tasks.create("localPublishToBintrayIfRequired") { task ->
+		task.doFirst {
+			if (isSnapshotVersion) {
 				println("NOT Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
 			} else {
 				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
-				project.exec {
-					it.workingDir(rootDir)
-					if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-						it.setCommandLine(File(rootDir, "gradlew.bat").absolutePath, "publishMingwX64PublicationToMavenRepository")
-					} else {
-						it.setCommandLine(File(rootDir, "gradlew").absolutePath, "publish")
-					}
+			}
+		}
+		afterEvaluate {
+			if (!isSnapshotVersion) {
+				if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+					task.finalizedBy("publishMingwX64PublicationToMavenRepository")
+				} else {
+					task.finalizedBy("publish")
 				}
 			}
 		}
 	}
 
-	tasks.create("dockerMultiPublishToBintray") {
-		it.doLast {
+	tasks.create("dockerMultiPublishToBintray") { task ->
+		task.doLast {
 			if (project.version.toString().contains("-SNAPSHOT")) {
 				println("NOT Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
 			} else {

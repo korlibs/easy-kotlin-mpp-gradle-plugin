@@ -5,6 +5,8 @@ import com.soywiz.korlibs.targets.*
 import org.gradle.api.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import java.io.*
+import com.moowork.gradle.node.*
+import com.moowork.gradle.node.npm.*
 
 open class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = false)
 open class KorlibsPluginNoNative : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = true)
@@ -16,6 +18,7 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
         extensions.add("korlibs", korlibs)
 
         plugins.apply("kotlin-multiplatform")
+		plugins.apply("com.moowork.node")
 
 		//println("KotlinVersion.CURRENT: ${KotlinVersion.CURRENT}")
 		//println("KORLIBS_KOTLIN_VERSION: $KORLIBS_KOTLIN_VERSION")
@@ -108,6 +111,18 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
         val (group, name, version) = dependency.split(":", limit = 3)
         return dependencyMulti(group, name, version, targets)
     }
+
+	@JvmOverloads
+	fun dependencyNodeModule(name: String, version: String) = project {
+		val node = extensions.getByType(NodeExtension::class.java)
+
+		val installNodeModule = tasks.create<NpmTask>("installJs${name.capitalize()}") {
+			onlyIf { !File(node.nodeModulesDir, name).exists() }
+			setArgs(arrayListOf("install", "$name@$version"))
+		}
+
+		tasks.getByName("jsNodeTest").dependsOn(installNodeModule)
+	}
 
     data class CInteropTargets(val name: String, val targets: List<String>)
 
