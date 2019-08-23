@@ -49,7 +49,7 @@ fun Project.configureBintrayTools() {
 				project.exec {
 					it.workingDir(rootDir)
 					if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-						it.setCommandLine("call", "/c", "gradlew.bat", "publishMingwX64PublicationToMavenRepository")
+						it.setCommandLine(File(rootDir, "gradlew.bat").absolutePath, "publishMingwX64PublicationToMavenRepository")
 					} else {
 						it.setCommandLine(File(rootDir, "gradlew").absolutePath, "publish")
 					}
