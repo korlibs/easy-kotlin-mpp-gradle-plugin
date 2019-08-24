@@ -15,17 +15,21 @@ fun Project.configureCreateVersion() {
 
 	fun releaseVersion(version: SemVer) {
 		val nextSnapshotVersion = version.withIncrementedVersion().withSnapshot()
-		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to version.version))
 		println("Releasing $version ... next snapshot version $nextSnapshotVersion")
+		if (shellExec("git", "status", "-s").outputIfNotError.isNotEmpty()) {
+			error("Must commit pending changes before releasing a new version")
+		}
+		command("git", "pull")
+		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to version.version))
 		command("./gradlew") // To refresh versions
 		command("git", "add", "-A")
-		command("git", "commit", "-m\"Release $version\"")
+		command("git", "commit", "-m", "Release $version")
 		command("git", "tag", "-a", "$version", "-m \"Release $version\"")
 		command("git", "push")
 		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to nextSnapshotVersion.version))
 		command("./gradlew") // To refresh versions
 		command("git", "add", "-A")
-		command("git", "commit", "-m\"Started $nextSnapshotVersion\"")
+		command("git", "commit", "-m", "Started $nextSnapshotVersion")
 		command("git", "push")
 	}
 
