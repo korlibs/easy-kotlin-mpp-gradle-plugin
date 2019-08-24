@@ -20,6 +20,7 @@ fun Project.configureCreateVersion() {
 			error("Must commit pending changes before releasing a new version")
 		}
 		command("git", "pull")
+		//command("git", "push")
 		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to version.version))
 		command("./gradlew") // To refresh versions
 		command("git", "add", "-A")
