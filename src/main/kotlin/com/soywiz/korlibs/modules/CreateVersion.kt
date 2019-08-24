@@ -27,6 +27,7 @@ fun Project.configureCreateVersion() {
 		command("git", "commit", "-m", "Release $version")
 		command("git", "tag", "-a", "$version", "-m \"Release $version\"")
 		command("git", "push")
+		command("git", "push", "--tags")
 		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to nextSnapshotVersion.version))
 		command("./gradlew") // To refresh versions
 		command("git", "add", "-A")
