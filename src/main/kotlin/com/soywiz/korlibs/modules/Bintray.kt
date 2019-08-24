@@ -38,17 +38,24 @@ fun Project.configureBintrayTools() {
     }
 
     tasks.create("actuallyPublishBintray") { task ->
+		task.group = "publishing"
         task.doLast {
-            actuallyPublishBintray()
+			if (isSnapshotVersion) {
+				println("NOT publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+			} else {
+				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+				actuallyPublishBintray()
+			}
         }
     }
 
     tasks.create("localPublishToBintrayIfRequired") { task ->
+		task.group = "publishing"
         task.doFirst {
             if (isSnapshotVersion) {
-                println("NOT Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+                println("NOT uploading to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
             } else {
-                println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+                println("Uploading to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
             }
         }
         afterEvaluate {
@@ -63,11 +70,12 @@ fun Project.configureBintrayTools() {
     }
 
     tasks.create("dockerMultiPublishToBintray") { task ->
+		task.group = "publishing"
         task.doLast {
             if (project.version.toString().contains("-SNAPSHOT")) {
-                println("NOT Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+                println("NOT uploading and publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
             } else {
-                println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+                println("Uploading and publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
                 project.exec {
                     it.workingDir(rootDir)
                     it.setCommandLine(File(rootDir, "gradlew").absolutePath, "publish")
