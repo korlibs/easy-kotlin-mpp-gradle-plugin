@@ -1,7 +1,6 @@
 package com.soywiz.korlibs.modules
 
 import com.soywiz.korlibs.create
-import com.soywiz.korlibs.gkotlin
 import com.soywiz.korlibs.korlibs
 import groovy.util.*
 import groovy.xml.*
@@ -9,12 +8,11 @@ import org.gradle.api.*
 import org.gradle.api.publish.*
 import org.gradle.api.publish.maven.*
 import org.gradle.jvm.tasks.Jar
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 fun Project.configurePublishing() {
     // Publishing
-    val publishUser = (rootProject.findProperty("BINTRAY_USER") ?: project.findProperty("bintrayUser") ?: System.getenv("BINTRAY_USER"))?.toString()
-    val publishPassword = (rootProject.findProperty("BINTRAY_KEY") ?: project.findProperty("bintrayApiKey") ?: System.getenv("BINTRAY_API_KEY"))?.toString()
+    val publishUser = project.BINTRAY_USER_null
+    val publishPassword = project.BINTRAY_KEY_null
 
     plugins.apply("maven-publish")
 
