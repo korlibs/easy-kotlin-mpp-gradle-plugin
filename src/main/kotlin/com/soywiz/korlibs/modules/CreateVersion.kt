@@ -16,11 +16,13 @@ fun Project.configureCreateVersion() {
 	fun releaseVersion(version: SemVer) {
 		val nextSnapshotVersion = version.withIncrementedVersion().withSnapshot()
 		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to version.version))
+		command("./gradlew") // To refresh versions
 		command("git", "add", "-a")
 		command("git", "commit", "-m\"Release $version\"")
 		command("git", "tag", "-a", "$version", "-m \"Release $version\"")
 		command("git", "push")
 		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to nextSnapshotVersion.version))
+		command("./gradlew") // To refresh versions
 		command("git", "add", "gradle.properties")
 		command("git", "commit", "-m\"Started $nextSnapshotVersion\"")
 		command("git", "push")
