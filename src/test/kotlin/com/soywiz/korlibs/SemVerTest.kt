@@ -15,6 +15,7 @@ class SemVerTest {
 		assertEquals("1.2.3-SNAPSHOT", SemVer("1.2.3").withSnapshot().withSnapshot().withoutSnapshot().withSnapshot().version)
 		assertEquals("1.2.3-SNAPSHOT", SemVer("1.2.3-SNAPSHOT").withSnapshot().withSnapshot().withoutSnapshot().withSnapshot().version)
 		assertEquals("1.2.3-SNAPSHOT", SemVer("1.2.3-SNAPSHOT-SNAPSHOT").withSnapshot().withSnapshot().withoutSnapshot().withSnapshot().version)
+		assertEquals("1.2.3", SemVer("1.2.3-SNAPSHOT-SNAPSHOT").withoutSnapshot().version)
 
 		assertEquals("1.2.4", SemVer("1.2.3").withIncrementedVersion().version)
 		assertEquals("1.3", SemVer("1.2").withIncrementedVersion().version)
