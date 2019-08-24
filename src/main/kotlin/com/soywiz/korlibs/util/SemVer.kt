@@ -6,7 +6,7 @@ data class SemVer(val major: Int, val minor: Int?, val patch: Int?, val suffix: 
 			append("$major")
 			if (minor != null) append(".$minor")
 			if (patch != null) append(".$patch")
-			if (suffix != null) append("-$suffix")
+			if (suffix != null) append("$suffix")
 		}
 	}
 
@@ -15,7 +15,7 @@ data class SemVer(val major: Int, val minor: Int?, val patch: Int?, val suffix: 
 		if (!(suffix ?: "").contains("-SNAPSHOT")) {
 			append("-SNAPSHOT")
 		}
-	}.trimStart('-'))
+	})
 
 	fun withoutSnapshot() = copy(suffix = suffix?.replace("-SNAPSHOT", ""))
 
@@ -30,7 +30,7 @@ data class SemVer(val major: Int, val minor: Int?, val patch: Int?, val suffix: 
 			val parts = version.split('-', limit = 2)
 			val versions = parts[0]
 			val iversions = versions.split('.').map { it.toIntOrNull() }
-			val suffix = parts.getOrNull(1)
+			val suffix = parts.getOrNull(1)?.let { "-$it" }
 			return SemVer(iversions.getOrNull(0) ?: 0, iversions.getOrNull(1), iversions.getOrNull(2), suffix)
 		}
 	}
