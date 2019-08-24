@@ -35,18 +35,22 @@ fun Project.configureCreateVersion() {
 		command("git", "push")
 	}
 
-	tasks.create("releaseVersion") { task ->
-		task.group = "versioning"
-		task.doLast {
-			val releaseVersion = project.findProperty("nextReleaseVersion") ?: error("Must specify nextReleaseVersion: ./gradlew releaseVersion -PnextReleaseVersion=x.y.z")
-			releaseVersion(SemVer(releaseVersion.toString()))
-		}
-	}
 
-	tasks.create("releaseQuickVersion") { task ->
-		task.group = "versioning"
-		task.doLast {
-			releaseVersion(SemVer(version.toString()).withoutSnapshot())
+	if (rootProject.tasks.findByName("releaseVersion") == null) {
+		rootProject.tasks.create("releaseVersion") { task ->
+			task.group = "versioning"
+			task.doLast {
+				val releaseVersion =
+					project.findProperty("nextReleaseVersion") ?: error("Must specify nextReleaseVersion: ./gradlew releaseVersion -PnextReleaseVersion=x.y.z")
+				releaseVersion(SemVer(releaseVersion.toString()))
+			}
+		}
+
+		rootProject.tasks.create("releaseQuickVersion") { task ->
+			task.group = "versioning"
+			task.doLast {
+				releaseVersion(SemVer(version.toString()).withoutSnapshot())
+			}
 		}
 	}
 }
