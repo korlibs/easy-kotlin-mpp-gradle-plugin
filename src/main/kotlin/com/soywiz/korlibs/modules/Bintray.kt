@@ -20,8 +20,8 @@ fun Project.configureBintrayTools() {
         findProperty("project.bintray.package")?.toString() ?: error("Can't find project.bintray.package")
     }
     val projectVersion by lazy { project.version.toString() }
-    val bintrayUser = project.BINTRAY_USER
-    val bintrayPass = project.BINTRAY_KEY
+    val bintrayUser by lazy { project.BINTRAY_USER }
+    val bintrayPass by lazy { project.BINTRAY_KEY }
 
     fun actuallyPublishBintray() {
         println("Trying to publish to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
