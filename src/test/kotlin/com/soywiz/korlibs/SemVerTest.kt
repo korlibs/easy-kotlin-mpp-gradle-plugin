@@ -24,5 +24,8 @@ class SemVerTest {
 		assertEquals("1.2.4-SNAPSHOT", SemVer("1.2.3-SNAPSHOT").withIncrementedVersion().version)
 		assertEquals("1.3-SNAPSHOT", SemVer("1.2-SNAPSHOT").withIncrementedVersion().version)
 		assertEquals("3-SNAPSHOT", SemVer("2-SNAPSHOT").withIncrementedVersion().version)
+
+		assertEquals("1.7.0-rc-1-SNAPSHOT", SemVer("1.7.0-rc-1-SNAPSHOT").version)
+		assertEquals("1.7.1-rc-1-SNAPSHOT", SemVer("1.7.0-rc-1-SNAPSHOT").withIncrementedVersion().version)
 	}
 }

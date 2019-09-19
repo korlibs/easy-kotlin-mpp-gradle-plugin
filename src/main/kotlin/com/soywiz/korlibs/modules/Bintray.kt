@@ -23,6 +23,9 @@ fun Project.configureBintrayTools() {
     val bintrayUser by lazy { project.BINTRAY_USER }
     val bintrayPass by lazy { project.BINTRAY_KEY }
 
+	//val onTravisPr by lazy { System.getenv("TRAVIS_PULL_REQUEST") == "true" }
+	//(System.getenv("TRAVIS_BRANCH") == "master") && (System.getenv("TRAVIS_PULL_REQUEST") == "false")
+
     fun actuallyPublishBintray() {
         println("Trying to publish to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
         println(
@@ -49,7 +52,7 @@ fun Project.configureBintrayTools() {
         }
     }
 
-    tasks.create("localPublishToBintrayIfRequired") { task ->
+    val localPublishToBintrayIfRequired = tasks.create("localPublishToBintrayIfRequired") { task ->
 		task.group = "publishing"
         task.doFirst {
             if (isSnapshotVersion) {
@@ -69,7 +72,25 @@ fun Project.configureBintrayTools() {
         }
     }
 
-    tasks.create("dockerMultiPublishToBintray") { task ->
+	tasks.create("localPublishToBintrayIfRequiredOnTravisMasterNoPR") { task ->
+		val travisIsOnMaster = (System.getenv("TRAVIS_BRANCH") == "master") && (System.getenv("TRAVIS_PULL_REQUEST") == "false")
+
+		task.group = "publishing"
+		//task.onlyIf { travisIsOnMaster }
+		if (travisIsOnMaster) {
+			task.dependsOn(localPublishToBintrayIfRequired)
+		}
+		task.doFirst {
+			println("localPublishToBintrayIfRequiredOnTravisMasterNoPR: travisIsOnMaster=$travisIsOnMaster : TRAVIS_BRANCH='${System.getenv("TRAVIS_BRANCH")}', TRAVIS_PULL_REQUEST='${System.getenv("TRAVIS_PULL_REQUEST")}'")
+			if (travisIsOnMaster) {
+				println(" - Running")
+			} else {
+				println(" - NOT Running")
+			}
+		}
+	}
+
+	tasks.create("dockerMultiPublishToBintray") { task ->
 		task.group = "publishing"
         task.doLast {
             if (project.version.toString().contains("-SNAPSHOT")) {
