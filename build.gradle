@@ -122,3 +122,21 @@ publishing {
         }
     }
 }
+
+publish.doLast {
+	def subject = project.property("project.bintray.org")
+	def repo = project.property("project.bintray.repository")
+	def _package = project.property("project.bintray.package")
+	def version = project.version
+
+	((HttpURLConnection)new URL("https://bintray.com/api/v1/content/$subject/$repo/$_package/$version/publish").openConnection()).with({
+		requestMethod = 'POST'
+		doOutput = true
+
+		setRequestProperty("Authorization", "Basic " + "$publishUser:$publishPassword".bytes.encodeBase64().toString())
+		outputStream.withPrintWriter({printWriter ->
+			printWriter.write('{"discard": false, "publish_wait_for_secs": -1}')
+		})
+		System.out.println(inputStream.text)
+	})
+}
