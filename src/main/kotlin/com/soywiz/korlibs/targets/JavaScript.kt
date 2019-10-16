@@ -1,10 +1,15 @@
 package com.soywiz.korlibs.targets
 
+import com.moowork.gradle.node.*
 import com.soywiz.korlibs.*
 import org.gradle.api.*
 import org.jetbrains.kotlin.gradle.plugin.*
 
 fun Project.configureTargetJavaScript() {
+	(project.extensions.getByName("node") as NodeExtension).apply {
+		version = "12.12.0"
+		//version = "10.16.3"
+	}
     gkotlin.apply {
         js {
 			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
