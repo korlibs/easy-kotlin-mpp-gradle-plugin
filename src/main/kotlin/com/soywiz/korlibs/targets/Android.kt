@@ -36,7 +36,7 @@ Gingerbread         2.3.3 to 2.3.7        0.3%↑           9, 19
 				//publishLibraryVariants("release")
                 //publishLibraryVariants("release", "debug")
 				publishAllLibraryVariants()
-				//publishLibraryVariantsGroupedByFlavor = true // @TODO: Check. Was this causing problems with Korio?
+				publishLibraryVariantsGroupedByFlavor = true
 				this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.androidJvm)
             }
         }
