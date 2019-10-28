@@ -11,6 +11,8 @@ import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
 import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 import java.io.*
 
+val linuxEnabled by lazy { !Os.isFamily(Os.FAMILY_MAC) }
+
 fun Project.configureTargetNative() {
     val nativeExtraJar = tasks.create<Jar>("nativeExtraJar") {
     }
@@ -33,9 +35,11 @@ fun Project.configureTargetNative() {
         macosX64() {
             extraNative()
         }
-        linuxX64() {
-            extraNative()
-        }
+		if (linuxEnabled) {
+			linuxX64() {
+				extraNative()
+			}
+		}
         mingwX64() {
             extraNative()
         }
@@ -44,7 +48,9 @@ fun Project.configureTargetNative() {
             when {
                 Os.isFamily(Os.FAMILY_WINDOWS) -> run { mingwX64("nativeCommon"); mingwX64("nativePosix") }
                 Os.isFamily(Os.FAMILY_MAC) -> run { macosX64("nativeCommon"); macosX64("nativePosix") }
-                else -> run { linuxX64("nativeCommon"); linuxX64("nativePosix") }
+                else -> run {
+					if (linuxEnabled) { linuxX64("nativeCommon"); linuxX64("nativePosix") }
+				}
             }
         }
 

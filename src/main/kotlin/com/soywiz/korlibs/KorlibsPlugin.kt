@@ -54,6 +54,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val prop_ANDROID_HOME = System.getenv("ANDROID_HOME")
     var hasAndroid = androidEnabled && ((prop_sdk_dir != null) || (prop_ANDROID_HOME != null))
 	val tryAndroidSdkDir = File(System.getProperty("user.home"), "/Library/Android/sdk")
+	val linuxEnabled get() = com.soywiz.korlibs.targets.linuxEnabled
 
     init {
         if (!hasAndroid && androidEnabled) {
@@ -75,7 +76,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 
 	val KORLIBS_KOTLIN_VERSION get() = com.soywiz.korlibs.KORLIBS_KOTLIN_VERSION
 	val isKotlinDev get() = KORLIBS_KOTLIN_VERSION.contains("-release")
-	val LINUX_DESKTOP_NATIVE_TARGETS = listOf("linuxX64")
+	val LINUX_DESKTOP_NATIVE_TARGETS = if (linuxEnabled) listOf("linuxX64") else listOf()
     val MACOS_DESKTOP_NATIVE_TARGETS = listOf("macosX64")
     //val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64", "mingwX86")
     val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64")
