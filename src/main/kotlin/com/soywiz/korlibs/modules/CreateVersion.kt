@@ -36,6 +36,7 @@ fun Project.configureCreateVersion() {
 		command("git", "add", "-A")
 		command("git", "commit", "-m", "Release $version")
 		command("git", "tag", "-a", "release-$version", "-m \"Release $version\"")
+		command("git", "push", "--follow-tags") // Trigger push on master with the release version
 		setVersion(nextSnapshotVersion.version)
 		command("./gradlew") // To refresh versions
 		command("git", "add", "-A")

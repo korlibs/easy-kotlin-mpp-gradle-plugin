@@ -27,7 +27,8 @@ fun Project.configureBintrayTools() {
 	val TRAVIS_BRANCH = System.getenv("TRAVIS_BRANCH") ?: ""
 	val TRAVIS_TAG = System.getenv("TRAVIS_TAG") ?: ""
 
-	val travisIsOnReleaseTag = (TRAVIS_TAG.startsWith("release-")) && (TRAVIS_PULL_REQUEST == "false")
+	//val travisIsOnReleaseTag = (TRAVIS_TAG.startsWith("release-")) && (TRAVIS_PULL_REQUEST == "false")
+	val travisIsOnReleaseTag = (TRAVIS_BRANCH == "master") && (TRAVIS_PULL_REQUEST == "false")
 
 	//val onTravisPr by lazy { System.getenv("TRAVIS_PULL_REQUEST") == "true" }
 	//(System.getenv("TRAVIS_BRANCH") == "master") && (System.getenv("TRAVIS_PULL_REQUEST") == "false")
