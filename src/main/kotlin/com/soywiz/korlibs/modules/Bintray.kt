@@ -23,10 +23,11 @@ fun Project.configureBintrayTools() {
     val bintrayUser by lazy { project.BINTRAY_USER }
     val bintrayPass by lazy { project.BINTRAY_KEY }
 
+	val TRAVIS_PULL_REQUEST = System.getenv("TRAVIS_PULL_REQUEST")
 	val TRAVIS_BRANCH = System.getenv("TRAVIS_BRANCH") ?: ""
 	val TRAVIS_TAG = System.getenv("TRAVIS_TAG") ?: ""
 
-	val travisIsOnReleaseTag = (TRAVIS_TAG.startsWith("release-")) && (System.getenv("TRAVIS_PULL_REQUEST") == "false")
+	val travisIsOnReleaseTag = (TRAVIS_TAG.startsWith("release-")) && (TRAVIS_PULL_REQUEST == "false")
 
 	//val onTravisPr by lazy { System.getenv("TRAVIS_PULL_REQUEST") == "true" }
 	//(System.getenv("TRAVIS_BRANCH") == "master") && (System.getenv("TRAVIS_PULL_REQUEST") == "false")
@@ -57,13 +58,13 @@ fun Project.configureBintrayTools() {
         }
     }
 
-	tasks.create("actuallyPublishBintrayIfOnTravisMasterNoPR") { task ->
+	tasks.create("actuallyPublishBintrayIfOnTravisReleaseTagNoPR") { task ->
 		task.group = "publishing"
 		task.doLast {
 			if (isSnapshotVersion || !travisIsOnReleaseTag) {
-				println("NOT publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, travisIsOnMaster=$travisIsOnReleaseTag)")
+				println("NOT publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, travisIsOnReleaseTag=$travisIsOnReleaseTag)")
 			} else {
-				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, travisIsOnMaster=$travisIsOnReleaseTag)")
+				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, travisIsOnReleaseTag=$travisIsOnReleaseTag)")
 				actuallyPublishBintray()
 			}
 		}
@@ -89,14 +90,14 @@ fun Project.configureBintrayTools() {
         }
     }
 
-	tasks.create("localPublishToBintrayIfRequiredOnTravisMasterNoPR") { task ->
+	tasks.create("localPublishToBintrayIfRequiredOnTravisReleaseTagNoPR") { task ->
 		task.group = "publishing"
 		//task.onlyIf { travisIsOnMaster }
 		if (travisIsOnReleaseTag) {
 			task.dependsOn(localPublishToBintrayIfRequired)
 		}
 		task.doFirst {
-			println("localPublishToBintrayIfRequiredOnTravisMasterNoPR: travisIsOnMaster=$travisIsOnReleaseTag : TRAVIS_BRANCH='${TRAVIS_BRANCH}', TRAVIS_TAG='${TRAVIS_TAG}', TRAVIS_PULL_REQUEST='${System.getenv("TRAVIS_PULL_REQUEST")}'")
+			println("localPublishToBintrayIfRequiredOnTravisMasterNoPR: travisIsOnMaster=$travisIsOnReleaseTag : TRAVIS_BRANCH='${TRAVIS_BRANCH}', TRAVIS_TAG='${TRAVIS_TAG}', TRAVIS_PULL_REQUEST='$TRAVIS_PULL_REQUEST'")
 			if (travisIsOnReleaseTag) {
 				println(" - Running")
 			} else {
@@ -125,6 +126,17 @@ fun Project.configureBintrayTools() {
             }
         }
     }
+
+	// Deprecated
+	tasks.create("localPublishToBintrayIfRequiredOnTravisMasterNoPR") { task ->
+		task.group = "publishing"
+		task.dependsOn("localPublishToBintrayIfRequiredOnTravisReleaseTagNoPR")
+	}
+
+	tasks.create("actuallyPublishBintrayIfOnTravisMasterNoPR") { task ->
+		task.group = "publishing"
+		task.dependsOn("actuallyPublishBintrayIfOnTravisReleaseTagNoPR")
+	}
 }
 
 val Project.BINTRAY_USER_null
