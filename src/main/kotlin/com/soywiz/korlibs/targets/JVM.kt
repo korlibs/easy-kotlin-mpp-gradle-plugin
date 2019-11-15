@@ -9,6 +9,13 @@ import org.jetbrains.kotlin.gradle.plugin.*
 fun Project.configureTargetJVM() {
     gkotlin.apply {
         jvm {
+			this.compilations.all {
+				//it.sourceCompatibility = JavaVersion.VERSION_1_8
+				//it.targetCompatibility = JavaVersion.VERSION_1_8
+				it.kotlinOptions {
+					this.jvmTarget = "1.8"
+				}
+			}
 			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
 		}
     }

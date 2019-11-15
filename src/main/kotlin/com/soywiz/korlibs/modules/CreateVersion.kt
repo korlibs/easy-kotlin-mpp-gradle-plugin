@@ -19,20 +19,28 @@ fun Project.configureCreateVersion() {
 		if (shellExec("git", "status", "-s").outputIfNotError.isNotEmpty()) {
 			error("Must commit pending changes before releasing a new version")
 		}
+		val CURRENT_BRANCH = shellExec("git", "rev-parse", "--abbrev-ref", "HEAD").outputIfNotError.trim()
+		if (CURRENT_BRANCH != "master") {
+			error("Must be in master branch (now git is in '${CURRENT_BRANCH}' branch)")
+		}
+
 		command("git", "pull")
 		//command("git", "push")
-		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to version.version))
-		command("./gradlew") // To refresh versions
+
+		fun setVersion(version: String) {
+			PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to version))
+			command("./gradlew") // To refresh versions
+		}
+
+		setVersion(version.version)
 		command("git", "add", "-A")
 		command("git", "commit", "-m", "Release $version")
-		command("git", "tag", "-a", "$version", "-m \"Release $version\"")
-		command("git", "push")
-		command("git", "push", "--tags")
-		PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to nextSnapshotVersion.version))
+		command("git", "tag", "-a", "release-$version", "-m \"Release $version\"")
+		setVersion(nextSnapshotVersion.version)
 		command("./gradlew") // To refresh versions
 		command("git", "add", "-A")
 		command("git", "commit", "-m", "Started $nextSnapshotVersion")
-		command("git", "push")
+		command("git", "push", "-all", "--tags", "origin")
 	}
 
 
