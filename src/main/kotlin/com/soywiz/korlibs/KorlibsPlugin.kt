@@ -48,6 +48,7 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
 val globalKorlibsDir: File by lazy { File(System.getProperty("user.home"), ".korlibs").apply { mkdirs() } }
 
 class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val androidEnabled: Boolean) {
+	val rootProject = project.rootProject
     val korlibsDir: File get() = globalKorlibsDir
     //init { println("KorlibsExtension:${project.name},nativeEnabled=$nativeEnabled,androidEnabled=$androidEnabled") }
 	val prop_sdk_dir = System.getProperty("sdk.dir")
@@ -55,6 +56,10 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     var hasAndroid = androidEnabled && ((prop_sdk_dir != null) || (prop_ANDROID_HOME != null))
 	val tryAndroidSdkDir = File(System.getProperty("user.home"), "/Library/Android/sdk")
 	val linuxEnabled get() = com.soywiz.korlibs.targets.linuxEnabled
+	val tvosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.tvos") }.firstOrNull() == "true"
+	val watchosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.watchos") }.firstOrNull() == "true"
+	val tvosEnabled = !tvosDisabled
+	val watchosEnabled = !watchosDisabled
 
     init {
         if (!hasAndroid && androidEnabled) {
@@ -82,8 +87,8 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64")
     val DESKTOP_NATIVE_TARGETS = LINUX_DESKTOP_NATIVE_TARGETS + MACOS_DESKTOP_NATIVE_TARGETS + WINDOWS_DESKTOP_NATIVE_TARGETS
     val BASE_IOS_TARGETS = listOf("iosArm64", "iosArm32", "iosX64")
-	val WATCHOS_TARGETS = listOf("watchosArm64", "watchosArm32", "watchosX86")
-	val TVOS_TARGETS = listOf("tvosArm64", "tvosX64")
+	val WATCHOS_TARGETS = if (watchosEnabled) listOf("watchosArm64", "watchosArm32", "watchosX86") else listOf()
+	val TVOS_TARGETS = if (tvosEnabled) listOf("tvosArm64", "tvosX64") else listOf()
 	val IOS_TARGETS = BASE_IOS_TARGETS + WATCHOS_TARGETS + TVOS_TARGETS
     val ALL_NATIVE_TARGETS = IOS_TARGETS + DESKTOP_NATIVE_TARGETS
     val ALL_ANDROID_TARGETS = if (hasAndroid) listOf("android") else listOf()

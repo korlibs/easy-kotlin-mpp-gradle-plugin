@@ -32,21 +32,25 @@ fun Project.configureTargetNative() {
 			extraNative()
 		}
 		/////////////////////////////////////////
-		tvosX64() {
-			extraNative()
-		}
-		tvosArm64() {
-			extraNative()
+		if (korlibs.tvosEnabled) {
+			tvosX64() {
+				extraNative()
+			}
+			tvosArm64() {
+				extraNative()
+			}
 		}
 		/////////////////////////////////////////
-		watchosX86() {
-			extraNative()
-		}
-		watchosArm32() {
-			extraNative()
-		}
-		watchosArm64() {
-			extraNative()
+		if (korlibs.watchosEnabled) {
+			watchosX86() {
+				extraNative()
+			}
+			watchosArm32() {
+				extraNative()
+			}
+			watchosArm64() {
+				extraNative()
+			}
 		}
 		/////////////////////////////////////////
 		macosX64() {
