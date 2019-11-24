@@ -7,10 +7,20 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import java.io.*
 import com.moowork.gradle.node.*
 import com.moowork.gradle.node.npm.*
+import org.jetbrains.kotlin.gradle.plugin.*
 
 open class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = false)
 open class KorlibsPluginNoNative : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = true)
 open class KorlibsPlugin : BaseKorlibsPlugin(nativeEnabled = true, androidEnabled = true)
+
+fun NamedDomainObjectContainer<KotlinSourceSet>.dependants(name: String, on: Set<String>) {
+	val main = maybeCreate("${name}Main")
+	val test = maybeCreate("${name}Test")
+	for (o in on) {
+		maybeCreate("${o}Main").dependsOn(main)
+		maybeCreate("${o}Test").dependsOn(test)
+	}
+}
 
 open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boolean) : Plugin<Project> {
     override fun apply(project: Project) = project {
@@ -33,7 +43,14 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
         if (nativeEnabled) {
             configureTargetNative()
         }
-        configureTargetJavaScript()
+		gkotlin.apply {
+			sourceSets.apply {
+				dependants("nonJs", korlibs.NON_JS_TARGETS)
+				dependants("nonNativeCommon", korlibs.ALL_NON_COMMON_TARGETS - korlibs.ALL_NATIVE_TARGETS)
+			}
+		}
+
+		configureTargetJavaScript()
         configureTargetJVM()
 
         // Publishing
@@ -81,24 +98,31 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 
 	val KORLIBS_KOTLIN_VERSION get() = com.soywiz.korlibs.KORLIBS_KOTLIN_VERSION
 	val isKotlinDev get() = KORLIBS_KOTLIN_VERSION.contains("-release")
-	val LINUX_DESKTOP_NATIVE_TARGETS = if (linuxEnabled) listOf("linuxX64") else listOf()
-    val MACOS_DESKTOP_NATIVE_TARGETS = listOf("macosX64")
+	val LINUX_DESKTOP_NATIVE_TARGETS = if (linuxEnabled) setOf("linuxX64") else setOf()
+    val MACOS_DESKTOP_NATIVE_TARGETS = setOf("macosX64")
     //val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64", "mingwX86")
-    val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64")
+    val WINDOWS_DESKTOP_NATIVE_TARGETS = setOf("mingwX64")
     val DESKTOP_NATIVE_TARGETS = LINUX_DESKTOP_NATIVE_TARGETS + MACOS_DESKTOP_NATIVE_TARGETS + WINDOWS_DESKTOP_NATIVE_TARGETS
-    val BASE_IOS_TARGETS = listOf("iosArm64", "iosArm32", "iosX64")
-	val WATCHOS_TARGETS = if (watchosEnabled) listOf("watchosArm64", "watchosArm32", "watchosX86") else listOf()
-	val TVOS_TARGETS = if (tvosEnabled) listOf("tvosArm64", "tvosX64") else listOf()
-	val IOS_TARGETS = BASE_IOS_TARGETS + WATCHOS_TARGETS + TVOS_TARGETS
-    val ALL_NATIVE_TARGETS = IOS_TARGETS + DESKTOP_NATIVE_TARGETS
-    val ALL_ANDROID_TARGETS = if (hasAndroid) listOf("android") else listOf()
-    val JS_TARGETS = listOf("js")
-    val JVM_TARGETS = listOf("jvm")
-    val COMMON_TARGETS = listOf("metadata")
-    val ALL_TARGETS = ALL_ANDROID_TARGETS + JS_TARGETS + JVM_TARGETS + COMMON_TARGETS + ALL_NATIVE_TARGETS
+    val IOS_TARGETS = setOf("iosArm64", "iosArm32", "iosX64")
+	val WATCHOS_TARGETS = if (watchosEnabled) setOf("watchosArm64", "watchosArm32", "watchosX86") else setOf()
+	val TVOS_TARGETS = if (tvosEnabled) setOf("tvosArm64", "tvosX64") else setOf()
+	val IOS_WATCHOS_TVOS_TARGETS = IOS_TARGETS + WATCHOS_TARGETS + TVOS_TARGETS
+	val APPLE_TARGETS = IOS_WATCHOS_TVOS_TARGETS + MACOS_DESKTOP_NATIVE_TARGETS
+	val ALL_NATIVE_TARGETS = (APPLE_TARGETS + DESKTOP_NATIVE_TARGETS).toSet()
+	val POSIX_NATIVE_TARGETS = ALL_NATIVE_TARGETS - WINDOWS_DESKTOP_NATIVE_TARGETS
+	val NATIVE_POSIX_APPLE_TARGETS = APPLE_TARGETS
+	val NATIVE_POSIX_NON_APPLE_TARGETS = ALL_NATIVE_TARGETS - NATIVE_POSIX_APPLE_TARGETS
+    val ALL_ANDROID_TARGETS = if (hasAndroid) setOf("android") else setOf()
+    val JS_TARGETS = setOf("js")
+    val JVM_TARGETS = setOf("jvm")
+	val JVM_ANDROID_TARGETS = JVM_TARGETS + ALL_ANDROID_TARGETS
+    val COMMON_TARGETS = setOf("metadata")
+	val ALL_NON_COMMON_TARGETS = ALL_ANDROID_TARGETS + JS_TARGETS + JVM_TARGETS + ALL_NATIVE_TARGETS
+    val ALL_TARGETS = ALL_NON_COMMON_TARGETS + ALL_NON_COMMON_TARGETS
+	val NON_JS_TARGETS = ALL_NON_COMMON_TARGETS - JS_TARGETS
 
-    @JvmOverloads
-    fun dependencyMulti(group: String, name: String, version: String, targets: List<String> = ALL_TARGETS, suffixCommonRename: Boolean = false, androidIsJvm: Boolean = false) = project {
+	@JvmOverloads
+    fun dependencyMulti(group: String, name: String, version: String, targets: Set<String> = ALL_TARGETS, suffixCommonRename: Boolean = false, androidIsJvm: Boolean = false) = project {
         dependencies {
             for (target in targets) {
                 val base = when (target) {
@@ -119,7 +143,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     }
 
     @JvmOverloads
-    fun dependencyMulti(dependency: String, targets: List<String> = ALL_TARGETS) {
+    fun dependencyMulti(dependency: String, targets: Set<String> = ALL_TARGETS) {
         val (group, name, version) = dependency.split(":", limit = 3)
         return dependencyMulti(group, name, version, targets)
     }
@@ -154,7 +178,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     }
 
     @JvmOverloads
-    fun dependencyCInteropsExternal(dependency: String, cinterop: String, targets: List<String> = ALL_NATIVE_TARGETS) {
+    fun dependencyCInteropsExternal(dependency: String, cinterop: String, targets: Set<String> = ALL_NATIVE_TARGETS) {
         dependencyMulti("$dependency:cinterop-$cinterop@klib", targets)
     }
 

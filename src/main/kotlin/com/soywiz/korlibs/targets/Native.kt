@@ -78,35 +78,11 @@ fun Project.configureTargetNative() {
 		}
 
 		sourceSets.apply {
-			fun dependants(name: String, on: Set<String>) {
-				val main = maybeCreate("${name}Main")
-				val test = maybeCreate("${name}Test")
-				for (o in on) {
-					maybeCreate("${o}Main").dependsOn(main)
-					maybeCreate("${o}Test").dependsOn(test)
-				}
-			}
-
-			val none = setOf<String>()
-			val android = if (hasAndroid) setOf() else setOf("android")
-			val jvm = korlibs.JVM_TARGETS.toSet()
-			val js = korlibs.JS_TARGETS.toSet()
-			val ios = korlibs.IOS_TARGETS.toSet()
-			val macos = korlibs.MACOS_DESKTOP_NATIVE_TARGETS.toSet()
-			val linux = korlibs.LINUX_DESKTOP_NATIVE_TARGETS.toSet()
-			val mingw = korlibs.WINDOWS_DESKTOP_NATIVE_TARGETS.toSet()
-			val apple = ios + macos
-			val allNative = apple + linux + mingw
-			val jvmAndroid = jvm + android
-			val allTargets = allNative + js + jvm + android
-
-			dependants("iosCommon", ios)
-			dependants("nativeCommon", allNative)
-			dependants("nonNativeCommon", allTargets - allNative)
-			dependants("nativePosix", allNative - mingw)
-			dependants("nativePosixNonApple", allNative - mingw - apple)
-			dependants("nativePosixApple", apple)
-			dependants("nonJs", allTargets - js)
+			dependants("nativeCommon", korlibs.ALL_NATIVE_TARGETS)
+			dependants("nativePosix", korlibs.POSIX_NATIVE_TARGETS)
+			dependants("nativePosixNonApple", korlibs.NATIVE_POSIX_NON_APPLE_TARGETS)
+			dependants("nativePosixApple", korlibs.NATIVE_POSIX_APPLE_TARGETS)
+			dependants("iosCommon", korlibs.IOS_TARGETS)
 		}
 	}
 
