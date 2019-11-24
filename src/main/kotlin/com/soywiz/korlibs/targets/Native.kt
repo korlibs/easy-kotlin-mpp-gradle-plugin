@@ -9,7 +9,9 @@ import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.targets.native.tasks.*
 
-val linuxEnabled by lazy { !Os.isFamily(Os.FAMILY_MAC) }
+val linuxEnabled by lazy {
+	!Os.isFamily(Os.FAMILY_MAC) && !Os.isFamily(Os.FAMILY_WINDOWS)
+}
 
 fun Project.configureTargetNative() {
 	val nativeExtraJar = tasks.create<Jar>("nativeExtraJar") {
