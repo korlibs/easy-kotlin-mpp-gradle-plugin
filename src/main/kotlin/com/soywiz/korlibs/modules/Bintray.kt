@@ -1,15 +1,14 @@
 package com.soywiz.korlibs.modules
 
+import com.soywiz.korlibs.util.*
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.api.Project
+import org.gradle.api.*
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
-val Project.isSnapshotVersion get() = version.toString().contains("-SNAPSHOT")
-
-fun Project.configureBintrayTools() {
+fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
     val projectBintrayOrg by lazy {
         findProperty("project.bintray.org")?.toString() ?: error("Can't find project.bintray.org")
     }
@@ -23,15 +22,12 @@ fun Project.configureBintrayTools() {
     val bintrayUser by lazy { project.BINTRAY_USER }
     val bintrayPass by lazy { project.BINTRAY_KEY }
 
-	val TRAVIS_PULL_REQUEST = System.getenv("TRAVIS_PULL_REQUEST")
-	val TRAVIS_BRANCH = System.getenv("TRAVIS_BRANCH") ?: ""
-	val TRAVIS_TAG = System.getenv("TRAVIS_TAG") ?: ""
+	val isSnapshotVersion = ci.isSnapshotVersion
+	val ciMustPublish = ci.ciMustPublish
+	val CI_BRANCH = ci.CI_BRANCH
+	val CI_PULL_REQUEST = ci.CI_PULL_REQUEST
 
-	//val travisIsOnReleaseTag = (TRAVIS_TAG.startsWith("release-")) && (TRAVIS_PULL_REQUEST == "false")
-	val travisIsOnReleaseTag = (TRAVIS_BRANCH == "master") && (TRAVIS_PULL_REQUEST == "false")
-
-	//val onTravisPr by lazy { System.getenv("TRAVIS_PULL_REQUEST") == "true" }
-	//(System.getenv("TRAVIS_BRANCH") == "master") && (System.getenv("TRAVIS_PULL_REQUEST") == "false")
+	val tra = "Travis"
 
     fun actuallyPublishBintray() {
         println("Trying to publish to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
@@ -59,17 +55,17 @@ fun Project.configureBintrayTools() {
         }
     }
 
-	tasks.create("actuallyPublishBintrayIfOnTravisReleaseTagNoPR") { task ->
+	val actuallyPublishBintrayIfOnCiReleaseTagNoPR = tasks.create("actuallyPublishBintrayIfOnCiReleaseTagNoPR") { task ->
 		task.group = "publishing"
 		task.doLast {
-			if (isSnapshotVersion || !travisIsOnReleaseTag) {
-				println("NOT publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, travisIsOnReleaseTag=$travisIsOnReleaseTag)")
+			if (isSnapshotVersion || !ciMustPublish) {
+				println("NOT publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, ciMustPublish=$ciMustPublish)")
 			} else {
-				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, travisIsOnReleaseTag=$travisIsOnReleaseTag)")
+				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, ciMustPublish=$ciMustPublish)")
 				actuallyPublishBintray()
 			}
 		}
-	}
+	}.alias("actuallyPublishBintrayIfOn${tra}ReleaseTagNoPR")
 
     val localPublishToBintrayIfRequired = tasks.create("localPublishToBintrayIfRequired") { task ->
 		task.group = "publishing"
@@ -91,21 +87,20 @@ fun Project.configureBintrayTools() {
         }
     }
 
-	tasks.create("localPublishToBintrayIfRequiredOnTravisReleaseTagNoPR") { task ->
+	val localPublishToBintrayIfRequiredOnCiReleaseTagNoPR = tasks.create("localPublishToBintrayIfRequiredOnCiReleaseTagNoPR") { task ->
 		task.group = "publishing"
-		//task.onlyIf { travisIsOnMaster }
-		if (travisIsOnReleaseTag) {
+		if (ciMustPublish) {
 			task.dependsOn(localPublishToBintrayIfRequired)
 		}
 		task.doFirst {
-			println("localPublishToBintrayIfRequiredOnTravisMasterNoPR: travisIsOnMaster=$travisIsOnReleaseTag : TRAVIS_BRANCH='${TRAVIS_BRANCH}', TRAVIS_TAG='${TRAVIS_TAG}', TRAVIS_PULL_REQUEST='$TRAVIS_PULL_REQUEST'")
-			if (travisIsOnReleaseTag) {
+			println("${task.name}: ciMustPublish=$ciMustPublish : CI_BRANCH='${CI_BRANCH}', CI_PULL_REQUEST='$CI_PULL_REQUEST'")
+			if (ciMustPublish) {
 				println(" - Running")
 			} else {
 				println(" - NOT Running")
 			}
 		}
-	}
+	}.alias("localPublishToBintrayIfRequiredOn${tra}ReleaseTagNoPR")
 
 	tasks.create("dockerMultiPublishToBintray") { task ->
 		task.group = "publishing"
@@ -129,28 +124,37 @@ fun Project.configureBintrayTools() {
     }
 
 	// Deprecated
-	tasks.create("localPublishToBintrayIfRequiredOnTravisMasterNoPR") { task ->
+	val localPublishToBintrayIfRequiredOnCiMasterNoPR = tasks.create("localPublishToBintrayIfRequiredOnCiMasterNoPR") { task ->
 		task.group = "publishing"
-		task.dependsOn("localPublishToBintrayIfRequiredOnTravisReleaseTagNoPR")
-	}
+		task.dependsOn(localPublishToBintrayIfRequiredOnCiReleaseTagNoPR)
+	}.alias("localPublishToBintrayIfRequiredOn${tra}MasterNoPR")
 
-	tasks.create("actuallyPublishBintrayIfOnTravisMasterNoPR") { task ->
+	val actuallyPublishBintrayIfOnCiMasterNoPR = tasks.create("actuallyPublishBintrayIfOnCiMasterNoPR") { task ->
 		task.group = "publishing"
-		task.dependsOn("actuallyPublishBintrayIfOnTravisReleaseTagNoPR")
+		task.dependsOn(actuallyPublishBintrayIfOnCiReleaseTagNoPR)
+	}.alias("actuallyPublishBintrayIfOn${tra}MasterNoPR")
+}
+
+fun <T : Task> T.alias(name: String): T {
+	val oldTask = this
+	project.tasks.create(name) { newTask ->
+		newTask.group = oldTask.group
+		newTask.dependsOn(oldTask)
 	}
+	return this
 }
 
 val Project.BINTRAY_USER_null
     get() = rootProject.findProperty("BINTRAY_USER")?.toString()
             ?: project.findProperty("bintrayUser")?.toString()
-            ?: System.getenv("BINTRAY_USER")?.toString()
+            ?: getEnv("BINTRAY_USER")?.toString()
 
 
 val Project.BINTRAY_KEY_null
     get() = rootProject.findProperty("BINTRAY_KEY")?.toString()
             ?: project.findProperty("bintrayApiKey")?.toString()
-            ?: System.getenv("BINTRAY_API_KEY")?.toString()
-            ?: System.getenv("BINTRAY_KEY")?.toString()
+            ?: getEnv("BINTRAY_API_KEY")?.toString()
+            ?: getEnv("BINTRAY_KEY")?.toString()
 
 val Project.BINTRAY_USER get() = BINTRAY_USER_null ?: error("Can't determine bintray user")
 val Project.BINTRAY_KEY get() = BINTRAY_KEY_null ?: error("Can't determine bintray API_KEY")

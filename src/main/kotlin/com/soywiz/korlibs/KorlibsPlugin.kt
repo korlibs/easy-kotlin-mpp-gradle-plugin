@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import java.io.*
 import com.moowork.gradle.node.*
 import com.moowork.gradle.node.npm.*
+import com.soywiz.korlibs.util.*
 import org.jetbrains.kotlin.gradle.plugin.*
 
 open class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = false)
@@ -69,7 +70,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     val korlibsDir: File get() = globalKorlibsDir
     //init { println("KorlibsExtension:${project.name},nativeEnabled=$nativeEnabled,androidEnabled=$androidEnabled") }
 	val prop_sdk_dir = System.getProperty("sdk.dir")
-	val prop_ANDROID_HOME = System.getenv("ANDROID_HOME")
+	val prop_ANDROID_HOME = getEnv("ANDROID_HOME")
     var hasAndroid = androidEnabled && ((prop_sdk_dir != null) || (prop_ANDROID_HOME != null))
 	val tryAndroidSdkDir = File(System.getProperty("user.home"), "/Library/Android/sdk")
 	val linuxEnabled get() = com.soywiz.korlibs.targets.linuxEnabled
