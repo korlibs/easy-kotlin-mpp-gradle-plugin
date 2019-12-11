@@ -93,7 +93,7 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
 			task.dependsOn(localPublishToBintrayIfRequired)
 		}
 		task.doFirst {
-			println("${task.name}: ciMustPublish=$ciMustPublish : CI_BRANCH='${CI_BRANCH}', CI_PULL_REQUEST='$CI_PULL_REQUEST'")
+			println("${task.name}: ciMustPublish=$ciMustPublish : version='${ci.version}', isSnapshotVersion=${isSnapshotVersion} CI_BRANCH='${CI_BRANCH}', CI_PULL_REQUEST='$CI_PULL_REQUEST'")
 			if (ciMustPublish) {
 				println(" - Running")
 			} else {
