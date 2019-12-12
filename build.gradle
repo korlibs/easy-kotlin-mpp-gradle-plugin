@@ -87,13 +87,30 @@ task javadocJar(type: Jar) {
 
 publishing {
     repositories {
-        maven {
-            credentials {
-                username = publishUser
-                password = publishPassword
-            }
-            url = uri("https://api.bintray.com/maven/${project.property("project.bintray.org")}/${project.property("project.bintray.repository")}/${project.property("project.bintray.package")}/")
-        }
+		def GITHUB_REPOSITORY = System.getenv("GITHUB_REPOSITORY")
+		def GITHUB_TOKEN = System.getenv("GITHUB_TOKEN")
+		//def GITHUB_REPOSITORY = "korlibs/easy-kotlin-mpp-gradle-plugin"
+		//def GITHUB_TOKEN = "test"
+		if (GITHUB_REPOSITORY != null && GITHUB_TOKEN != null) {
+			maven {
+				name = "GitHubPackages"
+				url = uri("https://maven.pkg.github.com/${GITHUB_REPOSITORY}")
+				credentials(HttpHeaderCredentials) {
+					name = "authorization"
+					value = "Bearer ${GITHUB_TOKEN}"
+				}
+			}
+		}
+
+		if (publishUser && publishPassword) {
+			maven {
+				credentials {
+					username = publishUser
+					password = publishPassword
+				}
+				url = uri("https://api.bintray.com/maven/${project.property("project.bintray.org")}/${project.property("project.bintray.repository")}/${project.property("project.bintray.package")}/")
+			}
+		}
     }
     publications {
         maven(MavenPublication) {
