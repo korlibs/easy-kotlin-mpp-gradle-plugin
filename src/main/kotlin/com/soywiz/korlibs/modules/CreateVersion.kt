@@ -43,9 +43,7 @@ fun Project.configureCreateVersion() {
 		command("git", "commit", "-m", "Started $nextSnapshotVersion")
 		//command("git", "push", "--all", "--tags", "origin")
 		command("git", "push", "--follow-tags")
-
 	}
-
 
 	if (rootProject.tasks.findByName("releaseVersion") == null) {
 		rootProject.tasks.create("releaseVersion") { task ->
