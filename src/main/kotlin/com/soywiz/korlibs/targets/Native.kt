@@ -85,6 +85,9 @@ fun Project.configureTargetNative() {
 			dependants("nativePosixNonApple", korlibs.NATIVE_POSIX_NON_APPLE_TARGETS)
 			dependants("nativePosixApple", korlibs.NATIVE_POSIX_APPLE_TARGETS)
 			dependants("iosCommon", korlibs.IOS_TARGETS)
+			dependants("tvosCommon", korlibs.TVOS_TARGETS)
+			dependants("watchosCommon", korlibs.WATCHOS_TARGETS)
+			dependants("iosWatchosTvosCommon", korlibs.IOS_WATCHOS_TVOS_TARGETS)
 		}
 	}
 
