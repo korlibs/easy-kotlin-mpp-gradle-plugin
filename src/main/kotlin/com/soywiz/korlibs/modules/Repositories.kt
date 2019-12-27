@@ -17,10 +17,8 @@ fun Project.configureKorlibsRepos() {
 				}
 			}
             maven {
-                //it.url = uri("https://dl.bintray.com/soywiz/soywiz")
                 it.url = uri("https://dl.bintray.com/korlibs/korlibs")
                 it.content {
-                    //it.includeGroupByRegex("com\\.soywiz\\.korlibs.*")
                     it.excludeGroup("Kotlin/Native")
                 }
             }
