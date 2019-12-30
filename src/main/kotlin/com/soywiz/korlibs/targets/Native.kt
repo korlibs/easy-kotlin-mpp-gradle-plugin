@@ -82,7 +82,9 @@ fun Project.configureTargetNative() {
 		sourceSets.apply {
 			dependants("nativeCommon", korlibs.ALL_NATIVE_TARGETS)
 			dependants("nativePosix", korlibs.POSIX_NATIVE_TARGETS)
-			dependants("nativePosixNonApple", korlibs.NATIVE_POSIX_NON_APPLE_TARGETS)
+			if (korlibs.NATIVE_POSIX_NON_APPLE_TARGETS.isNotEmpty()) {
+				dependants("nativePosixNonApple", korlibs.NATIVE_POSIX_NON_APPLE_TARGETS)
+			}
 			dependants("nativePosixApple", korlibs.NATIVE_POSIX_APPLE_TARGETS)
 			dependants("iosCommon", korlibs.IOS_TARGETS)
 			dependants("tvosCommon", korlibs.TVOS_TARGETS)
