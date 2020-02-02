@@ -47,6 +47,7 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
 		gkotlin.apply {
 			sourceSets.apply {
 				dependants("nonJs", korlibs.NON_JS_TARGETS)
+				dependants("nonJvm", korlibs.NON_JVM_TARGETS)
 				dependants("nonNativeCommon", korlibs.ALL_NON_COMMON_TARGETS - korlibs.ALL_NATIVE_TARGETS)
 			}
 		}
@@ -121,6 +122,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val ALL_NON_COMMON_TARGETS = ALL_ANDROID_TARGETS + JS_TARGETS + JVM_TARGETS + ALL_NATIVE_TARGETS
     val ALL_TARGETS = ALL_NON_COMMON_TARGETS + ALL_NON_COMMON_TARGETS
 	val NON_JS_TARGETS = ALL_NON_COMMON_TARGETS - JS_TARGETS
+	val NON_JVM_TARGETS = ALL_NON_COMMON_TARGETS - JVM_TARGETS
 
 	@JvmOverloads
     fun dependencyMulti(group: String, name: String, version: String, targets: Set<String> = ALL_TARGETS, suffixCommonRename: Boolean = false, androidIsJvm: Boolean = false) = project {
