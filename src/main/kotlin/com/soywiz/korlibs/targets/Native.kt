@@ -20,6 +20,11 @@ fun Project.configureTargetNative() {
 	fun AbstractKotlinTarget.extraNative() {
 		mavenPublication(Action { it.artifact(nativeExtraJar) })
 		this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
+		compilations.all {
+			it.kotlinOptions {
+				suppressWarnings = korlibs.supressWarnings
+			}
+		}
 	}
 
 	gkotlin.apply {

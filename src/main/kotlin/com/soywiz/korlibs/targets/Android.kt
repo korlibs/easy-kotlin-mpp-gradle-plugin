@@ -38,6 +38,11 @@ Gingerbread         2.3.3 to 2.3.7        0.3%↑           9, 19
 				publishAllLibraryVariants()
 				publishLibraryVariantsGroupedByFlavor = true
 				this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.androidJvm)
+				compilations.all {
+					it.kotlinOptions {
+						suppressWarnings = korlibs.supressWarnings
+					}
+				}
             }
         }
 

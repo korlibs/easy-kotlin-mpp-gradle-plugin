@@ -19,6 +19,7 @@ fun Project.configureTargetJavaScript() {
                     sourceMap = true
                     metaInfo = true
                     moduleKind = "umd"
+					suppressWarnings = korlibs.supressWarnings
                 }
             }
             mavenPublication(Action { publication ->

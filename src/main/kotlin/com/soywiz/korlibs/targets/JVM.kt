@@ -14,6 +14,7 @@ fun Project.configureTargetJVM() {
 				//it.targetCompatibility = JavaVersion.VERSION_1_8
 				it.kotlinOptions {
 					this.jvmTarget = "1.8"
+					this.suppressWarnings = korlibs.supressWarnings
 				}
 			}
 			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)

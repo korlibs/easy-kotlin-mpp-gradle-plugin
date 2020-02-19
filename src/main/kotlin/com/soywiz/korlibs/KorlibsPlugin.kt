@@ -79,6 +79,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val watchosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.watchos") }.firstOrNull() == "true"
 	val tvosEnabled = !tvosDisabled
 	val watchosEnabled = !watchosDisabled
+	val supressWarnings = project.findProperty("kotlinSupressWarnings")?.toString()?.toBoolean() ?: true
 
     init {
         if (!hasAndroid && androidEnabled) {
