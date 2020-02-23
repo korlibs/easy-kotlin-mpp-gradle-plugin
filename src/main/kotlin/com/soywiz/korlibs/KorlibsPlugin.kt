@@ -101,6 +101,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 
 	val KORLIBS_KOTLIN_VERSION get() = com.soywiz.korlibs.KORLIBS_KOTLIN_VERSION
 	val isKotlinDev get() = KORLIBS_KOTLIN_VERSION.contains("-release")
+	val isKotlinEap get() = KORLIBS_KOTLIN_VERSION.contains("-eap")
 	val LINUX_DESKTOP_NATIVE_TARGETS = if (linuxEnabled) setOf("linuxX64") else setOf()
     val MACOS_DESKTOP_NATIVE_TARGETS = setOf("macosX64")
     //val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64", "mingwX86")

@@ -16,6 +16,11 @@ fun Project.configureKorlibsRepos() {
 					it.url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
 				}
 			}
+			if (korlibs.isKotlinEap) {
+				maven {
+					it.url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
+				}
+			}
             maven {
                 it.url = uri("https://dl.bintray.com/korlibs/korlibs")
                 it.content {
