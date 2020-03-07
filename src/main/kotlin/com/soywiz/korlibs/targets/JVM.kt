@@ -29,11 +29,9 @@ fun Project.configureTargetJVM() {
 
     // Headless testing on JVM (so we can use GWT)
     tasks {
-        (getByName("jvmTest") as Test).apply {
-            jvmArgs = (jvmArgs ?: arrayListOf()) + arrayListOf("-Djava.awt.headless=true")
-            testLogging {
-                it.exceptionFormat = TestExceptionFormat.FULL
-            }
-        }
+		tasks.withType(Test::class.java) {
+			it.jvmArgs = (it.jvmArgs ?: arrayListOf()) + arrayListOf("-Djava.awt.headless=true")
+			it.testLogging.exceptionFormat = TestExceptionFormat.FULL
+		}
     }
 }
