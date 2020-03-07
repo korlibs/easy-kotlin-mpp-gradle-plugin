@@ -77,6 +77,8 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val linuxEnabled get() = com.soywiz.korlibs.targets.linuxEnabled
 	val tvosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.tvos") }.firstOrNull() == "true"
 	val watchosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.watchos") }.firstOrNull() == "true"
+	val nodejsDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.nodejs") }.firstOrNull() == "true"
+	val nodejsEnabled = !nodejsDisabled
 	val tvosEnabled = !tvosDisabled
 	val watchosEnabled = !watchosDisabled
 	val supressWarnings = project.findProperty("kotlinSupressWarnings")?.toString()?.toBoolean() ?: true

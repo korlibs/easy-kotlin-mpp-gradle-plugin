@@ -29,14 +29,18 @@ fun Project.configureTargetJavaScript() {
             })
             browser {
                 testTask {
-                    //useMocha() // @TODO: Seems to produce problems where the JS file is produced and consumed
+					useKarma {
+						useChromeHeadless()
+					}
                 }
             }
-            nodejs {
-                testTask {
-                    //useMocha() // @TODO: Seems to produce problems where the JS file is produced and consumed
-                }
-            }
+			if (korlibs.nodejsEnabled) {
+				nodejs {
+					testTask {
+						//useMocha()
+					}
+				}
+			}
         }
     }
 
