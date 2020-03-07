@@ -43,17 +43,16 @@ fun Project.configureTargetJavaScript() {
 	afterEvaluate {
 		for (target in korlibs.JS_TARGETS) {
 			val taskName = "copyResourcesToExecutable_$target"
-			val targetTestTask = tasks.findByName("${target}Test") as? Kotlin2JsCompile? ?: continue
-			val compileTestTask = tasks.findByName("compileTestKotlin${target.capitalize()}") ?: continue
+			val targetTestTask = tasks.findByName("${target}Test") ?: continue
+			val compileTestTask = tasks.findByName("compileTestKotlin${target.capitalize()}") as? Kotlin2JsCompile? ?: continue
 			val compileMainTask = tasks.findByName("compileKotlin${target.capitalize()}") ?: continue
+
+			//println("REGISTERED: $taskName, $targetTestTask, $compileTestTask, $compileMainTask")
 
 			tasks {
 				create<Copy>(taskName) {
-					for (sourceSet in gkotlin.sourceSets) {
-						from(sourceSet.resources)
-					}
-
-					into(targetTestTask.outputFile.parentFile.parentFile)
+					for (sourceSet in gkotlin.sourceSets) from(sourceSet.resources)
+					into(compileTestTask.outputFile.parentFile.parentFile)
 				}
 			}
 
