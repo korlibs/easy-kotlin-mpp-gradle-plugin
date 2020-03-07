@@ -99,11 +99,11 @@ fun Project.configureTargetNative() {
 	}
 
 	afterEvaluate {
-		for (target in korlibs.DESKTOP_NATIVE_TARGETS) {
+		for (target in korlibs.DESKTOP_NATIVE_TARGETS + korlibs.IOS_WATCHOS_TVOS_TARGETS) {
 			val taskName = "copyResourcesToExecutable_$target"
-			val targetTestTask = tasks.getByName("${target}Test") as KotlinNativeTest
-			val compileTestTask = tasks.getByName("compileTestKotlin${target.capitalize()}")
-			val compileMainTask = tasks.getByName("compileKotlin${target.capitalize()}")
+			val targetTestTask = tasks.findByName("${target}Test") as? KotlinNativeTest? ?: continue
+			val compileTestTask = tasks.findByName("compileTestKotlin${target.capitalize()}") ?: continue
+			val compileMainTask = tasks.findByName("compileKotlin${target.capitalize()}") ?: continue
 
 			tasks {
 				create<Copy>(taskName) {
