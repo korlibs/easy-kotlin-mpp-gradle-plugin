@@ -10,9 +10,9 @@ import com.moowork.gradle.node.npm.*
 import com.soywiz.korlibs.util.*
 import org.jetbrains.kotlin.gradle.plugin.*
 
-open class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = false)
-open class KorlibsPluginNoNative : BaseKorlibsPlugin(nativeEnabled = false, androidEnabled = true)
-open class KorlibsPlugin : BaseKorlibsPlugin(nativeEnabled = true, androidEnabled = true)
+open class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(nativeEnabled = false, suggestAndroidEnabled = false)
+open class KorlibsPluginNoNative : BaseKorlibsPlugin(nativeEnabled = false, suggestAndroidEnabled = null)
+open class KorlibsPlugin : BaseKorlibsPlugin(nativeEnabled = true, suggestAndroidEnabled = null)
 
 fun NamedDomainObjectContainer<KotlinSourceSet>.dependants(name: String, on: Set<String>) {
 	val main = maybeCreate("${name}Main")
@@ -23,9 +23,12 @@ fun NamedDomainObjectContainer<KotlinSourceSet>.dependants(name: String, on: Set
 	}
 }
 
-open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boolean) : Plugin<Project> {
+open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val suggestAndroidEnabled: Boolean?) : Plugin<Project> {
     override fun apply(project: Project) = project {
-        val korlibs = KorlibsExtension(this, nativeEnabled, androidEnabled)
+		val androidDisabled = (suggestAndroidEnabled == false) || (project.findProperty("disable.android") == "true") || (System.getenv("DISABLE_ANDROID") == "true")
+		val androidEnabled = !androidDisabled
+
+		val korlibs = KorlibsExtension(this, nativeEnabled, androidEnabled)
         extensions.add("korlibs", korlibs)
 
         plugins.apply("kotlin-multiplatform")
