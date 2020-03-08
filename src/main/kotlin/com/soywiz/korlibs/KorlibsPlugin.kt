@@ -43,7 +43,9 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val suggestAndroidEnabl
 
         // Platforms
         configureTargetCommon()
-        configureTargetAndroid()
+		if (korlibs.hasAndroid) {
+			configureTargetAndroid()
+		}
         if (nativeEnabled) {
             configureTargetNative()
         }

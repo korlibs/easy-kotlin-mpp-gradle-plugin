@@ -5,15 +5,14 @@ import org.gradle.api.*
 import org.jetbrains.kotlin.gradle.plugin.*
 
 fun Project.configureTargetAndroid() {
-    if (korlibs.hasAndroid) {
-        plugins.apply("com.android.library")
-        extensions.getByType(com.android.build.gradle.LibraryExtension::class.java).apply {
-            compileSdkVersion(project.findProperty("android.compile.sdk.version")?.toString()?.toIntOrNull() ?: 28)
-            defaultConfig {
-				it.minSdkVersion(project.findProperty("android.min.sdk.version")?.toString()?.toIntOrNull() ?: 16) // Previously 18
-                it.targetSdkVersion(project.findProperty("android.target.sdk.version")?.toString()?.toIntOrNull() ?: 28)
-            }
-        }
+    plugins.apply("com.android.library")
+	extensions.getByType(com.android.build.gradle.LibraryExtension::class.java).apply {
+		compileSdkVersion(project.findProperty("android.compile.sdk.version")?.toString()?.toIntOrNull() ?: 28)
+		defaultConfig {
+			it.minSdkVersion(project.findProperty("android.min.sdk.version")?.toString()?.toIntOrNull() ?: 16) // Previously 18
+			it.targetSdkVersion(project.findProperty("android.target.sdk.version")?.toString()?.toIntOrNull() ?: 28)
+		}
+	}
 
 /*
 As per: 3-Oct-2019
@@ -29,35 +28,32 @@ KitKat              4.4                   6.9%↓           19
 Jelly Bean          4.1.x, 4.2.x, 4.3.x   3.2%↑           16, 17, 18
 Ice Cream Sandwich  4.0.3, 4.0.4          0.3%            14, 15
 Gingerbread         2.3.3 to 2.3.7        0.3%↑           9, 19
- */
+*/
 
-        gkotlin.apply {
-            android {
-				//publishLibraryVariants("release")
-                //publishLibraryVariants("release", "debug")
-				publishAllLibraryVariants()
-				publishLibraryVariantsGroupedByFlavor = true
-				this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.androidJvm)
-				compilations.all {
-					it.kotlinOptions {
-						suppressWarnings = korlibs.supressWarnings
-					}
+	gkotlin.apply {
+		android {
+			//publishLibraryVariants("release")
+			//publishLibraryVariants("release", "debug")
+			publishAllLibraryVariants()
+			publishLibraryVariantsGroupedByFlavor = true
+			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.androidJvm)
+			compilations.all {
+				it.kotlinOptions {
+					suppressWarnings = korlibs.supressWarnings
 				}
-            }
-        }
-
-        dependencies {
-            add("androidMainImplementation", "org.jetbrains.kotlin:kotlin-stdlib")
-            add("androidTestImplementation", "org.jetbrains.kotlin:kotlin-test")
-            add("androidTestImplementation", "org.jetbrains.kotlin:kotlin-test-junit")
-        }
-
-		configurations.apply {
-			//smokeTest.extendsFrom testImplementation
-			this.getAt("androidTestImplementation").extendsFrom(this.getAt("commonMainApi"))
-			//androidTestImplementation.extendsFrom(commonMainApi)
+			}
 		}
+	}
 
+	dependencies {
+		add("androidMainImplementation", "org.jetbrains.kotlin:kotlin-stdlib")
+		add("androidTestImplementation", "org.jetbrains.kotlin:kotlin-test")
+		add("androidTestImplementation", "org.jetbrains.kotlin:kotlin-test-junit")
+	}
 
+	configurations.apply {
+		//smokeTest.extendsFrom testImplementation
+		this.getAt("androidTestImplementation").extendsFrom(this.getAt("commonMainApi"))
+		//androidTestImplementation.extendsFrom(commonMainApi)
 	}
 }
