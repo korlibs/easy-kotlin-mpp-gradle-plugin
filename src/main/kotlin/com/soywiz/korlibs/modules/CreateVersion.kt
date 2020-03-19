@@ -35,9 +35,11 @@ fun Project.configureCreateVersion() {
 		setVersion(version.version)
 		command("git", "add", "-A")
 		command("git", "commit", "-m", "Release $version")
-		command("git", "checkout", "-b", "releases/$version")
-		command("git", "tag", "-a", "release-$version", "-m \"Release $version\"")
-		command("git", "push", "--follow-tags") // Trigger push on master with the release version
+		val branchName = "releases/$version"
+		val tagName = "release-$version"
+		command("git", "checkout", "-b", branchName)
+		command("git", "tag", "-a", tagName, "-m \"Release $version\"")
+		command("git", "push", "--follow-tags", "--set-upstream", "origin", branchName) // Trigger push on master with the release version
 		command("git", "checkout", "master")
 		setVersion(nextSnapshotVersion.version)
 		command("./gradlew") // To refresh versions
