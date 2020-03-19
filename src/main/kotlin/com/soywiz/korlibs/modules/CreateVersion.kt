@@ -44,7 +44,7 @@ fun Project.configureCreateVersion() {
 		setVersion(nextSnapshotVersion.version)
 		command("./gradlew") // To refresh versions
 		command("git", "add", "-A")
-		command("git", "commit", "-m", "Started $nextSnapshotVersion")
+		command("git", "commit", "-m", "Started $nextSnapshotVersion - CI SKIP")
 		//command("git", "push", "--all", "--tags", "origin")
 		command("git", "push", "--follow-tags")
 	}
