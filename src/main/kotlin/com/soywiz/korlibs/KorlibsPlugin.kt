@@ -78,7 +78,10 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val prop_sdk_dir = System.getProperty("sdk.dir")
 	val prop_ANDROID_HOME = getEnv("ANDROID_HOME")
     var hasAndroid = androidEnabled && ((prop_sdk_dir != null) || (prop_ANDROID_HOME != null))
-	val tryAndroidSdkDir = File(System.getProperty("user.home"), "/Library/Android/sdk")
+	val tryAndroidSdkDirs = listOf(
+			File(System.getProperty("user.home"), "/Library/Android/sdk"),
+			File(System.getProperty("user.home"), "/Android/Sdk")
+	)
 	val linuxEnabled get() = com.soywiz.korlibs.targets.linuxEnabled
 	val tvosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.tvos") }.firstOrNull() == "true"
 	val watchosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.watchos") }.firstOrNull() == "true"
@@ -90,13 +93,16 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 
     init {
         if (!hasAndroid && androidEnabled) {
-            if (tryAndroidSdkDir.exists()) {
-                File(project.rootDir, "local.properties").writeText("sdk.dir=${tryAndroidSdkDir.absolutePath}")
-                hasAndroid = true
-            }
+			for (tryAndroidSdkDirs in tryAndroidSdkDirs) {
+				if (tryAndroidSdkDirs.exists()) {
+					File(project.rootDir, "local.properties").writeText("sdk.dir=${tryAndroidSdkDirs.absolutePath}")
+					hasAndroid = true
+					break
+				}
+			}
         }
 
-		project.logger.info("hasAndroid: $hasAndroid, sdk.dir=$prop_sdk_dir, ANDROID_HOME=$prop_ANDROID_HOME, tryAndroidSdkDir=$tryAndroidSdkDir (${tryAndroidSdkDir.exists()})")
+		project.logger.info("hasAndroid: $hasAndroid, sdk.dir=$prop_sdk_dir, ANDROID_HOME=$prop_ANDROID_HOME, tryAndroidSdkDir=$tryAndroidSdkDirs (${tryAndroidSdkDirs.any { it.exists() }})")
     }
 
     fun dependencyProject(name: String) = project {
