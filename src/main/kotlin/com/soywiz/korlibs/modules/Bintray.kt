@@ -45,6 +45,7 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
 
     tasks.create("actuallyPublishBintray") { task ->
 		task.group = "publishing"
+		task.dependsOn("publish")
         task.doLast {
 			if (isSnapshotVersion) {
 				println("NOT publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
