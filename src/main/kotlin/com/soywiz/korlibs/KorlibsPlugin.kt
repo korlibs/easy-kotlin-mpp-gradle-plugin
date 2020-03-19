@@ -1,5 +1,6 @@
 package com.soywiz.korlibs
 
+import com.android.build.gradle.internal.cxx.configure.createNativeBuildSystemVariantConfig
 import com.soywiz.korlibs.modules.*
 import com.soywiz.korlibs.targets.*
 import org.gradle.api.*
@@ -54,6 +55,7 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val suggestAndroidEnabl
 				dependants("nonJs", korlibs.NON_JS_TARGETS)
 				dependants("nonJvm", korlibs.NON_JVM_TARGETS)
 				dependants("nonNativeCommon", korlibs.ALL_NON_COMMON_TARGETS - korlibs.ALL_NATIVE_TARGETS)
+				dependants("jvmAndroid", korlibs.JVM_ANDROID_TARGETS)
 			}
 		}
 
