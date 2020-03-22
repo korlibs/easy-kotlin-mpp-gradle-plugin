@@ -88,6 +88,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val tvosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.tvos") }.firstOrNull() == "true"
 	val watchosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.watchos") }.firstOrNull() == "true"
 	val nodejsDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.nodejs") }.firstOrNull() == "true"
+	val androidNativeEnabled = listOf(project, rootProject).mapNotNull { it.findProperty("enable.android.native") }.firstOrNull() == "true"
 	val nodejsEnabled = !nodejsDisabled
 	val tvosEnabled = !tvosDisabled
 	val watchosEnabled = !watchosDisabled
@@ -125,9 +126,10 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     val IOS_TARGETS = setOf("iosArm64", "iosArm32", "iosX64")
 	val WATCHOS_TARGETS = if (watchosEnabled) setOf("watchosArm64", "watchosArm32", "watchosX86") else setOf()
 	val TVOS_TARGETS = if (tvosEnabled) setOf("tvosArm64", "tvosX64") else setOf()
-	val IOS_WATCHOS_TVOS_TARGETS = IOS_TARGETS + WATCHOS_TARGETS + TVOS_TARGETS
+		val IOS_WATCHOS_TVOS_TARGETS = IOS_TARGETS + WATCHOS_TARGETS + TVOS_TARGETS
 	val APPLE_TARGETS = IOS_WATCHOS_TVOS_TARGETS + MACOS_DESKTOP_NATIVE_TARGETS
-	val ALL_NATIVE_TARGETS = (APPLE_TARGETS + DESKTOP_NATIVE_TARGETS).toSet()
+	val ANDROID_NATIVE_TARGETS = if (androidNativeEnabled) listOf("androidNativeX86", "androidNativeX64", "androidNativeArm32", "androidNativeArm64") else listOf()
+	val ALL_NATIVE_TARGETS = (APPLE_TARGETS + ANDROID_NATIVE_TARGETS + DESKTOP_NATIVE_TARGETS).toSet()
 	val POSIX_NATIVE_TARGETS = ALL_NATIVE_TARGETS - WINDOWS_DESKTOP_NATIVE_TARGETS
 	val NATIVE_POSIX_APPLE_TARGETS = APPLE_TARGETS
 	val NATIVE_POSIX_NON_APPLE_TARGETS = POSIX_NATIVE_TARGETS - NATIVE_POSIX_APPLE_TARGETS

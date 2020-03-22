@@ -71,6 +71,20 @@ fun Project.configureTargetNative() {
 		mingwX64() {
 			extraNative()
 		}
+		if (korlibs.androidNativeEnabled) {
+			androidNativeArm32() {
+				extraNative()
+			}
+			androidNativeArm64() {
+				extraNative()
+			}
+			androidNativeX86() {
+				extraNative()
+			}
+			androidNativeX64() {
+				extraNative()
+			}
+		}
 
 		if (System.getProperty("idea.version") != null) {
 			when {
