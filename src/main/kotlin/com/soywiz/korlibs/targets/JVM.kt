@@ -13,7 +13,7 @@ fun Project.configureTargetJVM() {
 				//it.sourceCompatibility = JavaVersion.VERSION_1_8
 				//it.targetCompatibility = JavaVersion.VERSION_1_8
 				it.kotlinOptions {
-					this.jvmTarget = "1.8"
+					this.jvmTarget = "1.6"
 					this.suppressWarnings = korlibs.supressWarnings
 				}
 			}
