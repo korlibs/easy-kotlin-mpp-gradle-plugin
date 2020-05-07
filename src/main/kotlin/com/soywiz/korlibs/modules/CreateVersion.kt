@@ -24,12 +24,16 @@ fun Project.configureCreateVersion() {
 			error("Must be in master branch (now git is in '${CURRENT_BRANCH}' branch)")
 		}
 
+		val gradlewCommand = if (OsInfo.isWindows) arrayOf("cmd", "/C", "gradlew.bat") else arrayOf("./gradlew")
+
+		command(*gradlewCommand) // To refresh versions
+
 		command("git", "pull")
 		//command("git", "push")
 
 		fun setVersion(version: String) {
 			PropertiesUpdater.update(rootDir["gradle.properties"], mapOf("version" to version))
-			command("./gradlew") // To refresh versions
+			command(*gradlewCommand) // To refresh versions
 		}
 
 		setVersion(version.version)
@@ -42,7 +46,7 @@ fun Project.configureCreateVersion() {
 		command("git", "push", "--follow-tags", "--set-upstream", "origin", branchName) // Trigger push on master with the release version
 		command("git", "checkout", "master")
 		setVersion(nextSnapshotVersion.version)
-		command("./gradlew") // To refresh versions
+		command(*gradlewCommand) // To refresh versions
 		command("git", "add", "-A")
 		command("git", "commit", "-m", "Started $nextSnapshotVersion - CI SKIP")
 		//command("git", "push", "--all", "--tags", "origin")
