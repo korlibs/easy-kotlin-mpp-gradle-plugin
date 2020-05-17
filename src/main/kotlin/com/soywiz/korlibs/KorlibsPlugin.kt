@@ -11,9 +11,10 @@ import com.moowork.gradle.node.npm.*
 import com.soywiz.korlibs.util.*
 import org.jetbrains.kotlin.gradle.plugin.*
 
-open class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(nativeEnabled = false, suggestAndroidEnabled = false)
-open class KorlibsPluginNoNative : BaseKorlibsPlugin(nativeEnabled = false, suggestAndroidEnabled = null)
-open class KorlibsPlugin : BaseKorlibsPlugin(nativeEnabled = true, suggestAndroidEnabled = null)
+open class KorlibsPluginNoNativeNoAndroid : BaseKorlibsPlugin(suggestNativeEnabled = false, suggestAndroidEnabled = false)
+open class KorlibsPluginNoNative : BaseKorlibsPlugin(suggestNativeEnabled = false, suggestAndroidEnabled = null)
+open class KorlibsPluginNoAndroid : BaseKorlibsPlugin(suggestNativeEnabled = null, suggestAndroidEnabled = false)
+open class KorlibsPlugin : BaseKorlibsPlugin(suggestNativeEnabled = null, suggestAndroidEnabled = null)
 
 fun NamedDomainObjectContainer<KotlinSourceSet>.dependants(name: String, on: Set<String>) {
 	val main = maybeCreate("${name}Main")
@@ -24,10 +25,12 @@ fun NamedDomainObjectContainer<KotlinSourceSet>.dependants(name: String, on: Set
 	}
 }
 
-open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val suggestAndroidEnabled: Boolean?) : Plugin<Project> {
+open class BaseKorlibsPlugin(val suggestNativeEnabled: Boolean?, val suggestAndroidEnabled: Boolean?) : Plugin<Project> {
     override fun apply(project: Project) = project {
+		val nativeDisabled = (suggestNativeEnabled == false) || (project.findProperty("disable.native") == "true") || (System.getenv("DISABLE_NATIVE") == "true")
+		val nativeEnabled = !nativeDisabled || (project.findProperty("enable.native") == "true") || (System.getenv("ENABLE_NATIVE") == "true")
 		val androidDisabled = (suggestAndroidEnabled == false) || (project.findProperty("disable.android") == "true") || (System.getenv("DISABLE_ANDROID") == "true")
-		val androidEnabled = !androidDisabled
+		val androidEnabled = !androidDisabled || (project.findProperty("enable.android") == "true") || (System.getenv("ENABLE_ANDROID") == "true")
 
 		val korlibs = KorlibsExtension(this, nativeEnabled, androidEnabled)
         extensions.add("korlibs", korlibs)
