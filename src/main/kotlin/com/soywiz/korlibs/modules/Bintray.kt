@@ -9,9 +9,6 @@ import java.net.URL
 import java.util.*
 
 fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
-    val projectBintrayOrg by lazy {
-        findProperty("project.bintray.org")?.toString() ?: error("Can't find project.bintray.org")
-    }
     val projectBintrayRepository by lazy {
         findProperty("project.bintray.repository")?.toString() ?: error("Can't find project.bintray.repository")
     }
@@ -21,19 +18,23 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
     val projectVersion by lazy { project.version.toString() }
     val bintrayUser by lazy { project.BINTRAY_USER }
     val bintrayPass by lazy { project.BINTRAY_KEY }
-
+    val publishingTarget by lazy {
+	    findProperty("project.bintray.org")?.toString() ?: bintrayUser
+    }
+	
 	val isSnapshotVersion = ci.isSnapshotVersion
 	val ciMustPublish = ci.ciMustPublish
 	val CI_BRANCH = ci.CI_BRANCH
 	val CI_PULL_REQUEST = ci.CI_PULL_REQUEST
 
 	val tra = "Travis"
+	
 
     fun actuallyPublishBintray() {
-        println("Trying to publish to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+        println("Trying to publish to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
         println(
                 BintrayTools.publishToBintray(
-                        subject = projectBintrayOrg,
+                        subject = publishingTarget,
                         repo = projectBintrayRepository,
                         _package = projectBintrayPackage,
                         version = projectVersion,
@@ -48,9 +49,9 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
 		//task.dependsOn("publish") // Shouldn't be required with the new workflow
         task.doLast {
 			if (isSnapshotVersion) {
-				println("NOT publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+				println("NOT publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
 			} else {
-				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+				println("Publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
 				actuallyPublishBintray()
 			}
         }
@@ -60,9 +61,9 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
 		task.group = "publishing"
 		task.doLast {
 			if (isSnapshotVersion || !ciMustPublish) {
-				println("NOT publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, ciMustPublish=$ciMustPublish)")
+				println("NOT publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, ciMustPublish=$ciMustPublish)")
 			} else {
-				println("Publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, ciMustPublish=$ciMustPublish)")
+				println("Publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, ciMustPublish=$ciMustPublish)")
 				actuallyPublishBintray()
 			}
 		}
@@ -72,9 +73,9 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
 		task.group = "publishing"
         task.doFirst {
             if (isSnapshotVersion) {
-                println("NOT uploading to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+                println("NOT uploading to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
             } else {
-                println("Uploading to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+                println("Uploading to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
             }
         }
         afterEvaluate {
