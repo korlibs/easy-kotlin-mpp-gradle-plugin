@@ -108,9 +108,9 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
 		task.group = "publishing"
         task.doLast {
             if (project.version.toString().contains("-SNAPSHOT")) {
-                println("NOT uploading and publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
+                println("NOT uploading and publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
             } else {
-                println("Uploading and publishing to bintray $projectBintrayOrg/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+                println("Uploading and publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
                 project.exec {
                     it.workingDir(rootDir)
                     it.setCommandLine(File(rootDir, "gradlew").absolutePath, "publish")
