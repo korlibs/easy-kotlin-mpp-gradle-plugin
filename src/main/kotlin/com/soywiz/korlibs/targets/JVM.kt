@@ -34,6 +34,7 @@ fun Project.configureTargetJVM() {
 			val HEADLESS_TEST = (System.getenv("HEADLESS_TEST") == "true") || (project.findProperty("headless.test") == "true")
 			//val HEADLESS_TEST = !NO_HEADLESS_TEST
 			it.jvmArgs = (it.jvmArgs ?: arrayListOf()) + (if (HEADLESS_TEST) arrayListOf("-Djava.awt.headless=true") else arrayListOf())
+			it.testLogging.showStandardStreams = true
 			it.testLogging.exceptionFormat = TestExceptionFormat.FULL
 		}
     }
