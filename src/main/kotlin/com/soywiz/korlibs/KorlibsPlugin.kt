@@ -61,7 +61,9 @@ open class BaseKorlibsPlugin(val suggestNativeEnabled: Boolean?, val suggestAndr
 			}
 		}
 
-		configureTargetJavaScript()
+		if (korlibs.javascriptEnabled) {
+			configureTargetJavaScript()
+		}
         configureTargetJVM()
 
         // Publishing
@@ -95,6 +97,8 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val tvosEnabled = !tvosDisabled
 	val watchosEnabled = !watchosDisabled
 	val supressWarnings = project.findProperty("kotlinSupressWarnings")?.toString()?.toBoolean() ?: true
+	val javascriptDisabled = (project.findProperty("disable.javascript") == "true") || (System.getenv("DISABLE_JAVASCRIPT") == "true")
+	val javascriptEnabled = !javascriptDisabled
 
     init {
         if (!hasAndroid && androidEnabled) {
