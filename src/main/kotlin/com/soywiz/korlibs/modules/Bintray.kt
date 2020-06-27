@@ -8,7 +8,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
-fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
+fun Project.configureBintrayTools() {
     val projectBintrayRepository by lazy {
         findProperty("project.bintray.repository")?.toString() ?: error("Can't find project.bintray.repository")
     }
@@ -21,14 +21,6 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
     val publishingTarget by lazy {
 	    findProperty("project.bintray.org")?.toString() ?: bintrayUser
     }
-	
-	val isSnapshotVersion = ci.isSnapshotVersion
-	val ciMustPublish = ci.ciMustPublish
-	val CI_BRANCH = ci.CI_BRANCH
-	val CI_PULL_REQUEST = ci.CI_PULL_REQUEST
-
-	val tra = "Travis"
-	
 
     fun actuallyPublishBintray() {
         println("Trying to publish to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
@@ -48,115 +40,40 @@ fun Project.configureBintrayTools(ci: CI = CI(project.version)) {
 		task.group = "publishing"
 		//task.dependsOn("publish") // Shouldn't be required with the new workflow
         task.doLast {
-			if (isSnapshotVersion) {
-				println("NOT publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
-			} else {
-				println("Publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
-				actuallyPublishBintray()
-			}
+			println("Publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+			actuallyPublishBintray()
         }
     }
-
-	val actuallyPublishBintrayIfOnCiReleaseTagNoPR = tasks.create("actuallyPublishBintrayIfOnCiReleaseTagNoPR") { task ->
-		task.group = "publishing"
-		task.doLast {
-			if (isSnapshotVersion || !ciMustPublish) {
-				println("NOT publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, ciMustPublish=$ciMustPublish)")
-			} else {
-				println("Publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (isSnapshotVersion=$isSnapshotVersion, ciMustPublish=$ciMustPublish)")
-				actuallyPublishBintray()
-			}
-		}
-	}.alias("actuallyPublishBintrayIfOn${tra}ReleaseTagNoPR")
-
-    val localPublishToBintrayIfRequired = tasks.create("localPublishToBintrayIfRequired") { task ->
-		task.group = "publishing"
-        task.doFirst {
-            if (isSnapshotVersion) {
-                println("NOT uploading to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
-            } else {
-                println("Uploading to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
-            }
-        }
-        afterEvaluate {
-            if (!isSnapshotVersion) {
-                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    task.finalizedBy("publishMingwX64PublicationToMavenRepository")
-                } else {
-                    task.finalizedBy("publish")
-                }
-            }
-        }
-    }
-
-	val localPublishToBintrayIfRequiredOnCiReleaseTagNoPR = tasks.create("localPublishToBintrayIfRequiredOnCiReleaseTagNoPR") { task ->
-		task.group = "publishing"
-		if (ciMustPublish) {
-			task.dependsOn(localPublishToBintrayIfRequired)
-		}
-		task.doFirst {
-			println("${task.name}: ciMustPublish=$ciMustPublish : version='${ci.version}', isSnapshotVersion=${isSnapshotVersion} CI_BRANCH='${CI_BRANCH}', CI_PULL_REQUEST='$CI_PULL_REQUEST'")
-			if (ciMustPublish) {
-				println(" - Running")
-			} else {
-				println(" - NOT Running")
-			}
-		}
-	}.alias("localPublishToBintrayIfRequiredOn${tra}ReleaseTagNoPR")
 
 	tasks.create("dockerMultiPublishToBintray") { task ->
 		task.group = "publishing"
         task.doLast {
-            if (project.version.toString().contains("-SNAPSHOT")) {
-                println("NOT uploading and publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion... (since it has -SNAPSHOT in its version)")
-            } else {
-                println("Uploading and publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
-                project.exec {
-                    it.workingDir(rootDir)
-                    it.setCommandLine(File(rootDir, "gradlew").absolutePath, "publish")
-                }
-                project.exec {
-                    it.workingDir(rootDir)
-                    it.setCommandLine(File(rootDir, "gradlew_win").absolutePath, "publishMingwX64PublicationToMavenRepository")
-                }
-                actuallyPublishBintray()
-                println("Done")
-            }
+			println("Uploading and publishing to bintray $publishingTarget/$projectBintrayRepository/$projectBintrayPackage/$projectVersion...")
+			project.exec {
+				it.workingDir(rootDir)
+				it.setCommandLine(File(rootDir, "gradlew").absolutePath, "publish")
+			}
+			project.exec {
+				it.workingDir(rootDir)
+				it.setCommandLine(File(rootDir, "gradlew_win").absolutePath, "publishMingwX64PublicationToMavenRepository")
+			}
+			actuallyPublishBintray()
+			println("Done")
         }
     }
-
-	// Deprecated
-	val localPublishToBintrayIfRequiredOnCiMasterNoPR = tasks.create("localPublishToBintrayIfRequiredOnCiMasterNoPR") { task ->
-		task.group = "publishing"
-		task.dependsOn(localPublishToBintrayIfRequiredOnCiReleaseTagNoPR)
-	}.alias("localPublishToBintrayIfRequiredOn${tra}MasterNoPR")
-
-	val actuallyPublishBintrayIfOnCiMasterNoPR = tasks.create("actuallyPublishBintrayIfOnCiMasterNoPR") { task ->
-		task.group = "publishing"
-		task.dependsOn(actuallyPublishBintrayIfOnCiReleaseTagNoPR)
-	}.alias("actuallyPublishBintrayIfOn${tra}MasterNoPR")
-}
-
-fun <T : Task> T.alias(name: String): T {
-	val oldTask = this
-	project.tasks.create(name) { newTask ->
-		newTask.group = oldTask.group
-		newTask.dependsOn(oldTask)
-	}
-	return this
 }
 
 val Project.BINTRAY_USER_null
     get() = rootProject.findProperty("BINTRAY_USER")?.toString()
             ?: project.findProperty("bintrayUser")?.toString()
-            ?: getEnv("BINTRAY_USER")?.toString()
+            ?: getEnv("BINTRAY_USER")
 
 
 val Project.BINTRAY_KEY_null
     get() = rootProject.findProperty("BINTRAY_KEY")?.toString()
             ?: project.findProperty("bintrayApiKey")?.toString()
-            ?: getEnv("BINTRAY_API_KEY")?.toString()
-            ?: getEnv("BINTRAY_KEY")?.toString()
+            ?: getEnv("BINTRAY_API_KEY")
+            ?: getEnv("BINTRAY_KEY")
 
 val Project.BINTRAY_USER get() = BINTRAY_USER_null ?: error("Can't determine bintray user")
 val Project.BINTRAY_KEY get() = BINTRAY_KEY_null ?: error("Can't determine bintray API_KEY")

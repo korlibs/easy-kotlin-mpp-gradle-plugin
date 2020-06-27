@@ -11,14 +11,12 @@ fun Project.configureKorlibsRepos() {
                     it.excludeGroup("Kotlin/Native")
                 }
             }
-			if (korlibs.isKotlinDev) {
-				maven {
-					it.url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
-				}
-			}
-			if (korlibs.isKotlinEap) {
+			if (korlibs.isKotlinDev || korlibs.isKotlinEap) {
 				maven {
 					it.url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
+				}
+				maven {
+					it.url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
 				}
 			}
             maven {

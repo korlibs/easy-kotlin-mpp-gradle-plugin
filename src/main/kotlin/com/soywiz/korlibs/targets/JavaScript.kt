@@ -1,6 +1,5 @@
 package com.soywiz.korlibs.targets
 
-import com.moowork.gradle.node.*
 import com.soywiz.korlibs.*
 import org.gradle.api.*
 import org.gradle.api.tasks.*
@@ -8,12 +7,12 @@ import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.tasks.*
 
 fun Project.configureTargetJavaScript() {
-	(project.extensions.getByName("node") as NodeExtension).apply {
-		version = "12.12.0"
-		//version = "10.16.3"
-	}
+	//(project.extensions.getByName("node") as NodeExtension).apply {
+	//	version = "12.12.0"
+	//	//version = "10.16.3"
+	//}
     gkotlin.apply {
-        js {
+        js(BOTH) {
 			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
             compilations.all {
                 it.kotlinOptions.apply {

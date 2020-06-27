@@ -6,8 +6,6 @@ import com.soywiz.korlibs.targets.*
 import org.gradle.api.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import java.io.*
-import com.moowork.gradle.node.*
-import com.moowork.gradle.node.npm.*
 import com.soywiz.korlibs.util.*
 import org.jetbrains.kotlin.gradle.plugin.*
 
@@ -36,7 +34,7 @@ open class BaseKorlibsPlugin(val suggestNativeEnabled: Boolean?, val suggestAndr
         extensions.add("korlibs", korlibs)
 
         plugins.apply("kotlin-multiplatform")
-		plugins.apply("com.moowork.node")
+		//plugins.apply("com.moowork.node")
 
 		//println("KotlinVersion.CURRENT: ${KotlinVersion.CURRENT}")
 		//println("KORLIBS_KOTLIN_VERSION: $KORLIBS_KOTLIN_VERSION")
@@ -44,6 +42,7 @@ open class BaseKorlibsPlugin(val suggestNativeEnabled: Boolean?, val suggestAndr
 		//project.setProperty("KORLIBS_KOTLIN_VERSION", KORLIBS_KOTLIN_VERSION)
 
         configureKorlibsRepos()
+		configurePatchVersion()
 
         // Platforms
         configureTargetCommon()
@@ -120,7 +119,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 
 	val KORLIBS_KOTLIN_VERSION get() = com.soywiz.korlibs.KORLIBS_KOTLIN_VERSION
 	val isKotlinDev get() = KORLIBS_KOTLIN_VERSION.contains("-release")
-	val isKotlinEap get() = KORLIBS_KOTLIN_VERSION.contains("-eap")
+	val isKotlinEap get() = KORLIBS_KOTLIN_VERSION.contains("-eap") || KORLIBS_KOTLIN_VERSION.contains("-M")
 	val LINUX_DESKTOP_NATIVE_TARGETS = if (linuxEnabled) setOf("linuxX64") else setOf()
     val MACOS_DESKTOP_NATIVE_TARGETS = setOf("macosX64")
     //val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64", "mingwX86")
@@ -173,17 +172,17 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
         return dependencyMulti(group, name, version, targets)
     }
 
-	@JvmOverloads
-	fun dependencyNodeModule(name: String, version: String) = project {
-		val node = extensions.getByType(NodeExtension::class.java)
-
-		val installNodeModule = tasks.create<NpmTask>("installJs${name.capitalize()}") {
-			onlyIf { !File(node.nodeModulesDir, name).exists() }
-			setArgs(arrayListOf("install", "$name@$version"))
-		}
-
-		tasks.getByName("jsNodeTest").dependsOn(installNodeModule)
-	}
+	//@JvmOverloads
+	//fun dependencyNodeModule(name: String, version: String) = project {
+	//	val node = extensions.getByType(NodeExtension::class.java)
+	//
+	//	val installNodeModule = tasks.create<NpmTask>("installJs${name.capitalize()}") {
+	//		onlyIf { !File(node.nodeModulesDir, name).exists() }
+	//		setArgs(arrayListOf("install", "$name@$version"))
+	//	}
+	//
+	//	tasks.getByName("jsNodeTest").dependsOn(installNodeModule)
+	//}
 
     data class CInteropTargets(val name: String, val targets: List<String>)
 
