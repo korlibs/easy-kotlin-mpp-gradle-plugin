@@ -63,6 +63,11 @@ open class BaseKorlibsPlugin(val suggestNativeEnabled: Boolean?, val suggestAndr
 
 		if (korlibs.javascriptEnabled) {
 			configureTargetJavaScript()
+			if (korlibs.javascriptTestDisabled) {
+				for (name in listOf("jsTest", "jsNodeTest", "jsBrowserTest", "jsIrNodeTest", "jsIrBrowserTest", "jsLegacyNodeTest", "jsLegacyBrowserTest")) {
+					tasks.findByName(name)?.enabled = false
+				}
+			}
 		}
         configureTargetJVM()
 
@@ -99,8 +104,10 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val supressWarnings = project.findProperty("kotlinSupressWarnings")?.toString()?.toBoolean() ?: true
 	val javascriptDisabled = (project.findProperty("disable.javascript") == "true") || (System.getenv("DISABLE_JAVASCRIPT") == "true")
 	val javascriptEnabled = !javascriptDisabled
+	val javascriptTestDisabled = (project.findProperty("disable.javascript.test") == "true") || (System.getenv("DISABLE_JAVASCRIPT_TEST") == "true")
+	val javascriptTestEnabled = !javascriptDisabled
 
-    init {
+	init {
         if (!hasAndroid && androidEnabled) {
 			for (tryAndroidSdkDirs in tryAndroidSdkDirs) {
 				if (tryAndroidSdkDirs.exists()) {
