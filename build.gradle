@@ -1,11 +1,11 @@
 buildscript {
 	def isKotlinDev = kotlinVersion.contains("-release")
-	def isKotlinEAp = kotlinVersion.contains("-eap") || kotlinVersion.contains("-M")
+	def isKotlinEap = kotlinVersion.contains("-eap") || kotlinVersion.contains("-M")
     repositories {
 		mavenCentral()
 		jcenter()
         maven { url = uri("https://plugins.gradle.org/m2/") }
-		if (isKotlinDev || isKotlinEAp) {
+		if (isKotlinDev || isKotlinEap) {
 			maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
 			maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
 		}
@@ -28,26 +28,24 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 def isKotlinDev = kotlinVersion.contains("-release")
-def isKotlinEAp = kotlinVersion.contains("-eap") || kotlinVersion.contains("-M")
+def isKotlinEap = kotlinVersion.contains("-eap") || kotlinVersion.contains("-M")
 
 repositories {
     mavenLocal()
     mavenCentral()
     google()
     maven { url = uri("https://plugins.gradle.org/m2/") }
-	if (isKotlinDev) {
-		maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
-	}
-	if (isKotlinEAp) {
+	if (isKotlinDev || isKotlinEap) {
 		maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
+		maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
 	}
 }
 
-def forcedVersion = System.getenv('FORCED_KORGE_PLUGINS_VERSION')
+String forcedVersion = System.getenv('FORCED_KORGE_PLUGINS_VERSION')
 
 if (forcedVersion != null) {
 	allprojects {
-		this.version = forcedVersion
+		this.version = forcedVersion?.replace("refs/tags/v", "")?.replace("v", "") ?: project.version
 	}
 }
 
