@@ -88,11 +88,28 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     //init { println("KorlibsExtension:${project.name},nativeEnabled=$nativeEnabled,androidEnabled=$androidEnabled") }
 	val prop_sdk_dir = System.getProperty("sdk.dir")
 	val prop_ANDROID_HOME = getEnv("ANDROID_HOME")
-    var hasAndroid = androidEnabled && ((prop_sdk_dir != null) || (prop_ANDROID_HOME != null))
-	val tryAndroidSdkDirs = listOf(
-			File(System.getProperty("user.home"), "/Library/Android/sdk"),
-			File(System.getProperty("user.home"), "/Android/Sdk")
-	)
+    var hasAndroidInitial = androidEnabled && ((prop_sdk_dir != null) || (prop_ANDROID_HOME != null))
+	fun guessAndroidSdkPath(): String? {
+		val userHome = System.getProperty("user.home")
+		return listOfNotNull(
+				System.getenv("ANDROID_HOME"),
+				"$userHome/AppData/Local/Android/sdk",
+				"$userHome/Library/Android/sdk",
+				"$userHome/Android/Sdk"
+		).firstOrNull { File(it).exists() }
+	}
+
+	fun hasAndroidSdk(): Boolean {
+		val env = System.getenv("ANDROID_SDK_ROOT")
+		if (env != null) return true
+		val localPropsFile = File(rootProject.rootDir, "local.properties")
+		if (!localPropsFile.exists()) {
+			val sdkPath = guessAndroidSdkPath() ?: return false
+			localPropsFile.writeText("sdk.dir=${sdkPath.replace("\\", "/")}")
+		}
+		return true
+	}
+	val hasAndroid = hasAndroidInitial || ((!hasAndroidInitial && androidEnabled) && hasAndroidSdk())
 	val linuxEnabled get() = com.soywiz.korlibs.targets.linuxEnabled
 	val tvosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.tvos") }.firstOrNull() == "true"
 	val watchosDisabled = listOf(project, rootProject).mapNotNull { it.findProperty("disable.watchos") }.firstOrNull() == "true"
@@ -106,20 +123,6 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val javascriptEnabled = !javascriptDisabled
 	val javascriptTestDisabled = (project.findProperty("disable.javascript.test") == "true") || (System.getenv("DISABLE_JAVASCRIPT_TEST") == "true")
 	val javascriptTestEnabled = !javascriptDisabled
-
-	init {
-        if (!hasAndroid && androidEnabled) {
-			for (tryAndroidSdkDirs in tryAndroidSdkDirs) {
-				if (tryAndroidSdkDirs.exists()) {
-					File(project.rootDir, "local.properties").writeText("sdk.dir=${tryAndroidSdkDirs.absolutePath}")
-					hasAndroid = true
-					break
-				}
-			}
-        }
-
-		project.logger.info("hasAndroid: $hasAndroid, sdk.dir=$prop_sdk_dir, ANDROID_HOME=$prop_ANDROID_HOME, tryAndroidSdkDir=$tryAndroidSdkDirs (${tryAndroidSdkDirs.any { it.exists() }})")
-    }
 
     fun dependencyProject(name: String) = project {
         dependencies {
@@ -154,7 +157,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val ALL_NON_COMMON_TARGETS = ALL_ANDROID_TARGETS + JS_TARGETS + JVM_TARGETS + ALL_NATIVE_TARGETS
     val ALL_TARGETS = ALL_NON_COMMON_TARGETS + ALL_NON_COMMON_TARGETS
 	val NON_JS_TARGETS = ALL_NON_COMMON_TARGETS - JS_TARGETS
-	val NON_JVM_TARGETS = ALL_NON_COMMON_TARGETS - JVM_TARGETS
+	val NON_JVM_TARGETS = ALL_NON_COMMON_TARGETS - JVM_ANDROID_TARGETS
 
 	@JvmOverloads
     fun dependencyMulti(group: String, name: String, version: String, targets: Set<String> = ALL_TARGETS, suffixCommonRename: Boolean = false, androidIsJvm: Boolean = false) = project {
