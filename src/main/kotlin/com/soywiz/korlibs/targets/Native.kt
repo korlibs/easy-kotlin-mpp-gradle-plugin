@@ -111,6 +111,8 @@ fun Project.configureTargetNative() {
 			dependants("iosWatchosTvosCommon", korlibs.IOS_WATCHOS_TVOS_TARGETS)
 			dependants("iosTvosCommon", korlibs.IOS_TVOS_TARGETS)
 			dependants("iosWatchosCommon", korlibs.IOS_WATCHOS_TARGETS)
+			dependants("macosIosTvosCommon", korlibs.MACOS_IOS_TVOS_TARGETS)
+			dependants("macosIosWatchosCommon", korlibs.MACOS_IOS_WATCHOS_TARGETS)
 		}
 	}
 
