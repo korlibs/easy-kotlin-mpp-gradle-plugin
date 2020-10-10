@@ -142,7 +142,9 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     val IOS_TARGETS = setOf("iosArm64", "iosArm32", "iosX64")
 	val WATCHOS_TARGETS = if (watchosEnabled) setOf("watchosArm64", "watchosArm32", "watchosX86") else setOf()
 	val TVOS_TARGETS = if (tvosEnabled) setOf("tvosArm64", "tvosX64") else setOf()
-		val IOS_WATCHOS_TVOS_TARGETS = IOS_TARGETS + WATCHOS_TARGETS + TVOS_TARGETS
+	val IOS_WATCHOS_TVOS_TARGETS = IOS_TARGETS + WATCHOS_TARGETS + TVOS_TARGETS
+	val IOS_TVOS_TARGETS = IOS_TARGETS + TVOS_TARGETS
+	val IOS_WATCHOS_TARGETS = IOS_TARGETS + WATCHOS_TARGETS
 	val APPLE_TARGETS = IOS_WATCHOS_TVOS_TARGETS + MACOS_DESKTOP_NATIVE_TARGETS
 	val ANDROID_NATIVE_TARGETS = if (androidNativeEnabled) listOf("androidNativeX86", "androidNativeX64", "androidNativeArm32", "androidNativeArm64") else listOf()
 	val ALL_NATIVE_TARGETS = (APPLE_TARGETS + ANDROID_NATIVE_TARGETS + DESKTOP_NATIVE_TARGETS).toSet()
