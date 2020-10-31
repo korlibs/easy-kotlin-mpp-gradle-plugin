@@ -5,10 +5,10 @@ buildscript {
 		mavenCentral()
 		jcenter()
         maven { url = uri("https://plugins.gradle.org/m2/") }
-		if (isKotlinDev || isKotlinEap) {
-			maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
-			maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
-		}
+		//if (isKotlinDev || isKotlinEap) {
+		//	maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
+		//	maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
+		//}
     }
     dependencies {
         classpath("com.gradle.publish:plugin-publish-plugin:0.10.1")
@@ -35,10 +35,10 @@ repositories {
     mavenCentral()
     google()
     maven { url = uri("https://plugins.gradle.org/m2/") }
-	if (isKotlinDev || isKotlinEap) {
-		maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
-		maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
-	}
+	//if (isKotlinDev || isKotlinEap) {
+	//	maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
+	//	maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
+	//}
 }
 
 String forcedVersion = System.getenv('FORCED_KORGE_PLUGINS_VERSION')
