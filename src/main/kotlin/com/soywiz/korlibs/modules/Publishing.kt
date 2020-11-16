@@ -24,8 +24,7 @@ fun Project.configurePublishing() {
 		classifier = "sources"
 	}
 
-	val emptyJar = tasks.create<Jar>("emptyJar") {
-	}
+	//val emptyJar = tasks.create<Jar>("emptyJar") {}
 
 	if (publishUser == null || publishPassword == null) {
 		println("Publishing is not enabled. Was not able to determine either `publishUser` or `publishPassword`")
@@ -48,10 +47,8 @@ fun Project.configurePublishing() {
 			publications.withType(MavenPublication::class.java) { publication ->
 				//println("Publication: $publication : ${publication.name} : ${publication.artifactId}")
 				if (publication.name == "kotlinMultiplatform") {
-					publication.artifact(sourcesJar) {
-					}
-					publication.artifact(emptyJar) {
-					}
+					publication.artifact(sourcesJar) {}
+					//publication.artifact(emptyJar) {}
 				}
 
 				/*
