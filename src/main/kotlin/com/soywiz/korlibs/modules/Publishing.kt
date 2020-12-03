@@ -1,7 +1,6 @@
 package com.soywiz.korlibs.modules
 
-import com.soywiz.korlibs.create
-import com.soywiz.korlibs.korlibs
+import com.soywiz.korlibs.*
 import groovy.util.*
 import groovy.xml.*
 import org.gradle.api.*
@@ -22,28 +21,40 @@ fun Project.configurePublishing() {
 
 	val sourcesJar = tasks.create<Jar>("sourceJar") {
 		classifier = "sources"
+		val mySourceSet = gkotlin.sourceSets["jvmMain"]
+		//val mySourceSet = gkotlin.sourceSets["commonMain"]
+		for (dep in mySourceSet.dependsOn + mySourceSet) {
+			from(dep.kotlin.srcDirs) {
+				it.into(dep.name)
+			}
+		}
+		//from(zipTree((tasks.getByName("jvmSourcesJar") as Jar).outputs))
 	}
 
 	//val emptyJar = tasks.create<Jar>("emptyJar") {}
 
-	if (publishUser == null || publishPassword == null) {
-		println("Publishing is not enabled. Was not able to determine either `publishUser` or `publishPassword`")
-		return
-	}
 	val publishing = extensions.getByType(PublishingExtension::class.java)
 	publishing.apply {
-		repositories {
-			it.maven {
-				it.credentials {
-					it.username = publishUser
-					it.setPassword(publishPassword)
+		if (publishUser == null || publishPassword == null) {
+			println("Publishing is not enabled. Was not able to determine either `publishUser` or `publishPassword`")
+		} else {
+
+			repositories {
+				it.maven {
+					it.credentials {
+						it.username = publishUser
+						it.password = publishPassword
+					}
+					it.url = uri(
+						"https://api.bintray.com/maven/${project.property("project.bintray.org")}/${
+							project.property("project.bintray.repository")
+						}/${project.property("project.bintray.package")}/"
+					)
 				}
-				it.url = uri("https://api.bintray.com/maven/${project.property("project.bintray.org")}/${project.property("project.bintray.repository")}/${project.property("project.bintray.package")}/")
 			}
 		}
 		afterEvaluate {
 			//println(gkotlin.sourceSets.names)
-
 			publications.withType(MavenPublication::class.java) { publication ->
 				//println("Publication: $publication : ${publication.name} : ${publication.artifactId}")
 				if (publication.name == "kotlinMultiplatform") {
