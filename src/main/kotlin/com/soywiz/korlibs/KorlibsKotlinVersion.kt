@@ -1,3 +1,3 @@
 package com.soywiz.korlibs
 
-val KORLIBS_KOTLIN_VERSION = "1.4.20"
+val KORLIBS_KOTLIN_VERSION = "1.4.30-M1"
