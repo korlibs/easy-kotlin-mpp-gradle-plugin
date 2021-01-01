@@ -22,6 +22,8 @@ buildscript {
         classpath("com.soywiz.korlibs:easy-kotlin-mpp-gradle-plugin:<some-version>")
     }
 }
+
+apply<com.soywiz.korlibs.KorlibsPlugin>()
 ```
 
 If using Gradle Groovy DSL (`build.gradle`), add:
