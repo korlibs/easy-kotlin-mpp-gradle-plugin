@@ -1,10 +1,8 @@
 buildscript {
     repositories {
+		mavenLocal()
 		mavenCentral()
-		jcenter()
         maven { url = uri("https://plugins.gradle.org/m2/") }
-		maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
-		maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
     }
     dependencies {
         classpath("com.gradle.publish:plugin-publish-plugin:0.13.0")
@@ -30,8 +28,6 @@ repositories {
     mavenCentral()
     google()
     maven { url = uri("https://plugins.gradle.org/m2/") }
-	maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
-	maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
 }
 
 String forcedVersion = System.getenv('FORCED_KORGE_PLUGINS_VERSION')

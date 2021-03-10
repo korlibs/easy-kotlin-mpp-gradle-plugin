@@ -1,6 +1,5 @@
 package com.soywiz.korlibs.modules
 
-import com.soywiz.korlibs.korlibs
 import org.gradle.api.*
 
 fun Project.configureKorlibsRepos() {
@@ -11,21 +10,7 @@ fun Project.configureKorlibsRepos() {
                     it.excludeGroup("Kotlin/Native")
                 }
             }
-			if (korlibs.isKotlinDev || korlibs.isKotlinEap) {
-				maven {
-					it.url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
-				}
-				maven {
-					it.url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
-				}
-			}
-            maven {
-                it.url = uri("https://dl.bintray.com/korlibs/korlibs")
-                it.content {
-                    it.excludeGroup("Kotlin/Native")
-                }
-            }
-            jcenter() {
+            mavenCentral() {
                 it.content {
                     it.excludeGroup("Kotlin/Native")
                 }
