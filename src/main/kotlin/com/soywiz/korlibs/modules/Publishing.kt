@@ -10,8 +10,11 @@ import org.gradle.jvm.tasks.Jar
 
 fun Project.configurePublishing() {
     // Publishing
-    val publishUser = project.BINTRAY_USER_null
-    val publishPassword = project.BINTRAY_KEY_null
+    //val publishUser = project.BINTRAY_USER_null
+    //val publishPassword = project.BINTRAY_KEY_null
+
+	val publishUser = project.sonatypePublishUserNull
+	val publishPassword = project.sonatypePublishPasswordNull
 
     plugins.apply("maven-publish")
 
@@ -33,7 +36,6 @@ fun Project.configurePublishing() {
 
 	//val emptyJar = tasks.create<Jar>("emptyJar") {}
 
-	val publishing = extensions.getByType(PublishingExtension::class.java)
 	publishing.apply {
 		if (publishUser == null || publishPassword == null) {
 			println("Publishing is not enabled. Was not able to determine either `publishUser` or `publishPassword`")
@@ -45,11 +47,16 @@ fun Project.configurePublishing() {
 						it.username = publishUser
 						it.password = publishPassword
 					}
-					it.url = uri(
-						"https://api.bintray.com/maven/${project.property("project.bintray.org")}/${
-							project.property("project.bintray.repository")
-						}/${project.property("project.bintray.package")}/"
-					)
+					if (version.toString().contains("-SNAPSHOT")) {
+						it.url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+					} else {
+						it.url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+					}
+					//it.url = uri(
+					//	"https://api.bintray.com/maven/${project.property("project.bintray.org")}/${
+					//		project.property("project.bintray.repository")
+					//	}/${project.property("project.bintray.package")}/"
+					//)
 				}
 			}
 		}
@@ -108,6 +115,13 @@ fun Project.configurePublishing() {
 								appendNode("url").setValue(project.property("project.license.url"))
 							}
 						}
+						appendNode("developers").apply {
+							appendNode("developer").apply {
+								appendNode("id").setValue(project.property("project.author.id"))
+								appendNode("name").setValue(project.property("project.author.name"))
+								appendNode("email").setValue(project.property("project.author.email"))
+							}
+						}
 						appendNode("scm").apply {
 							appendNode("url").setValue(project.property("project.scm.url"))
 						}
@@ -150,3 +164,5 @@ fun Project.configurePublishing() {
 		}
 	}
 }
+
+val Project.publishing get() = extensions.getByType(PublishingExtension::class.java)
