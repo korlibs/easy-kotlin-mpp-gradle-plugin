@@ -71,6 +71,7 @@ Some useful links and commands:
 * <https://www.gnupg.org/gph/en/manual/x56.html>
 * <https://docs.gradle.org/current/userguide/signing_plugin.html>
 * <https://stackoverflow.com/questions/57921325/gradle-signarchives-unable-to-read-secret-key>
+* <https://gist.github.com/kag0/fb6b7ce0816b77fe8349>
 * `gpg --full-generate-key`
 * `gpg --output public.pgp --armor --export username@email`
 * `gpg --armor --export-secret-keys foobar@example.com | awk 'NR == 1 { print "signing.signingKey=" } 1' ORS='\\n'`
