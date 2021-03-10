@@ -107,6 +107,13 @@ fun Project.configurePublishing() {
 								appendNode("url").setValue(project.property("project.license.url"))
 							}
 						}
+						appendNode("developers").apply {
+							appendNode("developer").apply {
+								appendNode("id").setValue(project.property("project.author.id"))
+								appendNode("name").setValue(project.property("project.author.name"))
+								appendNode("email").setValue(project.property("project.author.email"))
+							}
+						}
 						appendNode("scm").apply {
 							appendNode("url").setValue(project.property("project.scm.url"))
 						}
