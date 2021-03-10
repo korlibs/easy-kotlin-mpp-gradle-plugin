@@ -1,5 +1,6 @@
 package com.soywiz.korlibs.modules
 
+/*
 import com.soywiz.korlibs.util.*
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.*
@@ -128,3 +129,4 @@ object BintrayTools {
         }
     }
 }
+*/

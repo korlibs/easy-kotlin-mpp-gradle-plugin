@@ -1,5 +1,6 @@
 package com.soywiz.korlibs.modules
 
+/*
 import com.soywiz.korlibs.*
 import com.soywiz.korlibs.util.*
 import org.gradle.api.*
@@ -71,3 +72,4 @@ fun Project.configureCreateVersion() {
 		}
 	}
 }
+*/

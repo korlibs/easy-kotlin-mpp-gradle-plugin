@@ -1,6 +1,5 @@
 package com.soywiz.korlibs
 
-import com.android.build.gradle.internal.cxx.configure.createNativeBuildSystemVariantConfig
 import com.soywiz.korlibs.modules.*
 import com.soywiz.korlibs.targets.*
 import org.gradle.api.*
@@ -76,10 +75,13 @@ open class BaseKorlibsPlugin(val suggestNativeEnabled: Boolean?, val suggestAndr
 
         // Publishing
         configurePublishing()
-		configureBintrayTools()
+		//configureBintrayTools()
 
 		// Create version
-		configureCreateVersion()
+		//configureCreateVersion()
+
+		// Sonatype
+		configureMavenCentralRelease()
     }
 }
 
