@@ -33,7 +33,6 @@ fun Project.configurePublishing() {
 
 	//val emptyJar = tasks.create<Jar>("emptyJar") {}
 
-	val publishing = extensions.getByType(PublishingExtension::class.java)
 	publishing.apply {
 		if (publishUser == null || publishPassword == null) {
 			println("Publishing is not enabled. Was not able to determine either `publishUser` or `publishPassword`")
@@ -150,3 +149,5 @@ fun Project.configurePublishing() {
 		}
 	}
 }
+
+val Project.publishing get() = extensions.getByType(PublishingExtension::class.java)

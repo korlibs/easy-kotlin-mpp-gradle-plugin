@@ -44,6 +44,9 @@ open class BaseKorlibsPlugin(val suggestNativeEnabled: Boolean?, val suggestAndr
         configureKorlibsRepos()
 		configurePatchVersion()
 
+		// Signing
+		configureSigning()
+
         // Platforms
         configureTargetCommon()
 		if (korlibs.hasAndroid) {
