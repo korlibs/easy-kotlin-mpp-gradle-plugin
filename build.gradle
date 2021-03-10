@@ -180,6 +180,39 @@ publishing {
     }
 }
 
+tasks.create("externalReleaseMavenCentral", GradleBuild) {
+	it.dependsOn("publishToMavenLocal")
+	it.tasks = ["releaseMavenCentral"]
+	File tempDir = null
+	it.doFirst {
+		tempDir = File.createTempDir()
+		println("Created dir $tempDir...")
+		dir(tempDir)
+		new File(tempDir, "settings.gradle").text = ''
+		new File(tempDir, "build.gradle").text = """
+			\tbuildscript {
+			\t\trepositories {
+			\t\t\tmavenLocal()
+			\t\t\tmavenCentral()
+			\t\t\tgoogle()
+			\t\t\tmaven { url = uri("https://plugins.gradle.org/m2/") }
+			\t\t}
+			\t\tdependencies {
+			\t\t\tclasspath("com.soywiz.korlibs:easy-kotlin-mpp-gradle-plugin:${project.version}")
+			\t\t}
+			\t}
+			
+			project.group = '${project.group}'
+			\tapply plugin: "com.soywiz.korlibs.easy-kotlin-mpp-gradle-plugin"
+		"""
+	}
+	it.doLast {
+		tempDir?.deleteDir()
+	}
+}
+
+publish.finalizedBy(externalReleaseMavenCentral)
+
 //publish.doLast {
 //	def subject = project.property("project.bintray.org")
 //	def repo = project.property("project.bintray.repository")
