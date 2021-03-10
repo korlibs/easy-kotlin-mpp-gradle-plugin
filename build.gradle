@@ -163,6 +163,13 @@ publishing {
                 name = project.name
                 description = project.property("project.description")
                 url = project.property("project.scm.url")
+				developers {
+					developer {
+						id = project.property("project.author.id")
+						name = project.property("project.author.name")
+						email = project.property("project.author.email")
+					}
+				}
                 licenses {
                     license {
                         name = project.property("project.license.name")
