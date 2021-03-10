@@ -85,8 +85,8 @@ gradlePlugin {
 //def publishUser = (rootProject.findProperty("BINTRAY_USER") ?: project.findProperty("bintrayUser") ?: System.getenv("BINTRAY_USER"))?.toString()
 //def publishPassword = (rootProject.findProperty("BINTRAY_KEY") ?: project.findProperty("bintrayApiKey") ?: System.getenv("BINTRAY_API_KEY") ?: System.getenv("BINTRAY_KEY"))?.toString()
 
-def sonatypePublishUser = (rootProject.findProperty("SONATYPE_USERNAME") ?: project.findProperty("sonatypeUsername")?.toString())
-def sonatypePublishPassword = (rootProject.findProperty("SONATYPE_PASSWORD") ?: project.findProperty("sonatypePassword")?.toString())
+def sonatypePublishUser = (System.getenv("SONATYPE_USERNAME") ?: rootProject.findProperty("SONATYPE_USERNAME")?.toString() ?: project.findProperty("sonatypeUsername")?.toString())
+def sonatypePublishPassword = (System.getenv("SONATYPE_PASSWORD") ?: rootProject.findProperty("SONATYPE_PASSWORD")?.toString() ?: project.findProperty("sonatypePassword")?.toString())
 
 if (sonatypePublishUser == null || sonatypePublishPassword == null) {
     println("Required sonatypeUsername and sonatypePassword in ~/.gradle/gradle.properties")
