@@ -50,56 +50,60 @@ open class Sonatype(
 		println("Trying to release groupId=$groupId")
 		val profileId = findProfileIdByGroupId(groupId)
 		println("Determined profileId=$profileId")
-		val repositoryId = findProfileRepositories(profileId).firstOrNull()
-		if (repositoryId == null) {
+		val repositoryIds = findProfileRepositories(profileId).toMutableList()
+		if (repositoryIds.isEmpty()) {
 			println("Can't find any repositories for profileId=$profileId for groupId=$groupId. Artifacts weren't upload?")
 			return false
 		}
-		var promoted = false
+		val totalRepositories = repositoryIds.size
+		var promoted = 0
 		var stepCount = 0
-		loop@while (true) {
+		process@while (true) {
 			stepCount++
 			if (stepCount > 200) {
 				error("Too much steps. stepCount=$stepCount")
 			}
-			val state = try {
-				getRepositoryState(repositoryId)
-			} catch (e: SimpleHttpException) {
-				if (e.responseCode == 404) {
-					println("Can't find $repositoryId anymore. Probably released. Stopping")
-					break@loop
-				} else {
-					throw e
+			repo@for (repositoryId in repositoryIds.toList()) {
+				val state = try {
+					getRepositoryState(repositoryId)
+				} catch (e: SimpleHttpException) {
+					if (e.responseCode == 404) {
+						println("Can't find $repositoryId anymore. Probably released. Stopping")
+						repositoryIds.remove(repositoryId)
+						continue@repo
+					} else {
+						throw e
+					}
+				}
+				when {
+					state.transitioning -> {
+						println("Waiting transition $state")
+					}
+					// Even if open, if there are notifications we should drop it
+					state.notifications > 0 -> {
+						println("Dropping release because of error state.notifications=$state")
+						repositoryDrop(repositoryId)
+						repositoryIds.remove(repositoryId)
+					}
+					state.isOpen -> {
+						println("Closing open repository $state")
+						repositoryClose(repositoryId)
+					}
+					else -> {
+						println("Promoting repository $state")
+						repositoryPromote(repositoryId)
+						promoted++
+					}
 				}
 			}
-			if (state.transitioning) {
-				println("Waiting transition $state")
-				Thread.sleep(15_000L)
-				continue@loop
+			if (repositoryIds.isEmpty()) {
+				println("Completed")
+				break@process
 			}
-			when {
-				// Even if open, if there are notifications we should drop it
-				state.notifications > 0 -> {
-					println("Dropping release because of error state.notifications=$state")
-					repositoryDrop(repositoryId)
-					promoted = false
-					break@loop
-				}
-				state.isOpen -> {
-					println("Closing open repository $state")
-					repositoryClose(repositoryId)
-					Thread.sleep(5_000L)
-				}
-				else -> {
-					println("Promoting repository $state")
-					repositoryPromote(repositoryId)
-					Thread.sleep(5_000L)
-					promoted = true
-				}
-			}
+			Thread.sleep(15_000L)
 		}
 
-		return promoted
+		return promoted == totalRepositories
 	}
 
 	open val client = SimpleHttpClient(user, pass)
@@ -108,6 +112,7 @@ open class Sonatype(
 		val info = client.request("${BASE}/repository/$repositoryId")
 		//println("info: ${info.toStringPretty()}")
 		return RepoState(
+			repositoryId = repositoryId,
 			type = info["type"].asString,
 			notifications = info["notifications"].asInt,
 			transitioning = info["transitioning"].asBoolean,
@@ -115,6 +120,7 @@ open class Sonatype(
 	}
 
 	data class RepoState(
+		val repositoryId: String,
 		// "open" or "closed"
 		val type: String,
 		val notifications: Int,
