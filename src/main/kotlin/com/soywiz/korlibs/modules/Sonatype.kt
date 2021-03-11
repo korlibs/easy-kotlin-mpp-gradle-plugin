@@ -12,10 +12,12 @@ val Project.sonatypePublishUser get() = sonatypePublishUserNull ?: error("Can't 
 val Project.sonatypePublishPassword get() = sonatypePublishPasswordNull ?: error("Can't get SONATYPE_PASSWORD/sonatypePassword")
 
 fun Project.configureMavenCentralRelease() {
-	rootProject.tasks.create("releaseMavenCentral") { task ->
-		task.doLast {
-			if (!Sonatype.fromProject(project).releaseGroupId(project.group.toString())) {
-				error("Can't promote artifacts. Check log for details")
+	if (rootProject.tasks.findByName("releaseMavenCentral") == null) {
+		rootProject.tasks.create("releaseMavenCentral") { task ->
+			task.doLast {
+				if (!Sonatype.fromProject(project).releaseGroupId(project.group.toString())) {
+					error("Can't promote artifacts. Check log for details")
+				}
 			}
 		}
 	}
