@@ -14,7 +14,9 @@ val Project.sonatypePublishPassword get() = sonatypePublishPasswordNull ?: error
 fun Project.configureMavenCentralRelease() {
 	rootProject.tasks.create("releaseMavenCentral") { task ->
 		task.doLast {
-			Sonatype.fromProject(project).releaseGroupId(project.group.toString())
+			if (!Sonatype.fromProject(project).releaseGroupId(project.group.toString())) {
+				error("Can't promote artifacts. Check log for details")
+			}
 		}
 	}
 }
@@ -86,10 +88,12 @@ open class Sonatype(
 				state.isOpen -> {
 					println("Closing open repository $state")
 					repositoryClose(repositoryId)
+					Thread.sleep(5_000L)
 				}
 				else -> {
 					println("Promoting repository $state")
 					repositoryPromote(repositoryId)
+					Thread.sleep(5_000L)
 					promoted = true
 				}
 			}
