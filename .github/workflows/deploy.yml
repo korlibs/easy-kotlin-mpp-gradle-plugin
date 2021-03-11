@@ -26,4 +26,4 @@ jobs:
           java-version: 1.8
       - run: chmod +x gradlew
       - run: ./gradlew check
-      - run: ./gradlew publish
+      - run: ./gradlew publishMavenPublicationToMavenRepository

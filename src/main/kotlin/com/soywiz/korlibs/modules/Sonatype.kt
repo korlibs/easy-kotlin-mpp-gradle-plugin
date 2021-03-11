@@ -76,15 +76,16 @@ open class Sonatype(
 				continue@loop
 			}
 			when {
-				state.isOpen -> {
-					println("Closing open repository $state")
-					repositoryClose(repositoryId)
-				}
+				// Even if open, if there are notifications we should drop it
 				state.notifications > 0 -> {
 					println("Dropping release because of error state.notifications=$state")
 					repositoryDrop(repositoryId)
 					promoted = false
 					break@loop
+				}
+				state.isOpen -> {
+					println("Closing open repository $state")
+					repositoryClose(repositoryId)
 				}
 				else -> {
 					println("Promoting repository $state")
@@ -99,7 +100,6 @@ open class Sonatype(
 
 	open val client = SimpleHttpClient(user, pass)
 
-	// "open" or "closed"
 	fun getRepositoryState(repositoryId: String): RepoState {
 		val info = client.request("${BASE}/repository/$repositoryId")
 		//println("info: ${info.toStringPretty()}")
