@@ -55,11 +55,11 @@ if (signingSecretKeyRingFile != null || signingKey != null) {
 }
 
 dependencies {
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
 	testImplementation("org.jetbrains.kotlin:kotlin-test")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
-    implementation("com.android.tools.build:gradle:4.0.2")
+	implementation("com.android.tools.build:gradle:4.2.0-beta06") // This one doesn't require jcenter: https://maven.google.com/web/index.html?q=com.android.tools.build#com.android.tools.build:gradle:4.2.0-beta06
     compile gradleApi()
     compile localGroovy()
 }
