@@ -211,8 +211,6 @@ tasks.create("externalReleaseMavenCentral", GradleBuild) {
 	}
 }
 
-publishMavenPublicationToMavenRepository.finalizedBy(externalReleaseMavenCentral)
-
 //publish.doLast {
 //	def subject = project.property("project.bintray.org")
 //	def repo = project.property("project.bintray.repository")

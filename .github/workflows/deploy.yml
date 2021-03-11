@@ -27,3 +27,4 @@ jobs:
       - run: chmod +x gradlew
       - run: ./gradlew check
       - run: ./gradlew publishMavenPublicationToMavenRepository
+      - run: ./gradlew externalReleaseMavenCentral
