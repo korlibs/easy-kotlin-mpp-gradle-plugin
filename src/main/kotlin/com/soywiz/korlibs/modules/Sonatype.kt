@@ -60,6 +60,7 @@ open class Sonatype(
 		val totalRepositories = repositoryIds.size
 		var promoted = 0
 		var stepCount = 0
+		var retryCount = 0
 		process@while (true) {
 			stepCount++
 			if (stepCount > 200) {
@@ -69,12 +70,24 @@ open class Sonatype(
 				val state = try {
 					getRepositoryState(repositoryId)
 				} catch (e: SimpleHttpException) {
-					if (e.responseCode == 404) {
-						println("Can't find $repositoryId anymore. Probably released. Stopping")
-						repositoryIds.remove(repositoryId)
-						continue@repo
-					} else {
-						throw e
+					when (e.responseCode) {
+						404 -> {
+							println("Can't find $repositoryId anymore. Probably released. Stopping")
+							repositoryIds.remove(repositoryId)
+							continue@repo
+						}
+						// Server error
+						// @TODO: We should handle retrying on other operations too
+						in 500..599 -> { // Sometimes  HTTP Error 502 Bad Gateway
+							e.printStackTrace()
+							println("Retrying...")
+							Thread.sleep(15_000L)
+							retryCount++
+							continue@repo
+						}
+						else -> {
+							throw e
+						}
 					}
 				}
 				when {
@@ -99,10 +112,10 @@ open class Sonatype(
 				}
 			}
 			if (repositoryIds.isEmpty()) {
-				println("Completed")
+				println("Completed promoted=$promoted, totalRepositories=$totalRepositories, retryCount=$retryCount")
 				break@process
 			}
-			Thread.sleep(15_000L)
+			Thread.sleep(30_000L)
 		}
 
 		return promoted == totalRepositories
