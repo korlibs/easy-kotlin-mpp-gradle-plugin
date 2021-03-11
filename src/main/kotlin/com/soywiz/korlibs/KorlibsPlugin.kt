@@ -32,6 +32,8 @@ open class BaseKorlibsPlugin(val suggestNativeEnabled: Boolean?, val suggestAndr
 		val korlibs = KorlibsExtension(this, nativeEnabled, androidEnabled)
         extensions.add("korlibs", korlibs)
 
+		//println("project.gradle.gradleVersion=${project.gradle.gradleVersion}, javaVersion=${System.getProperty("java.version")}")
+
         plugins.apply("kotlin-multiplatform")
 		//plugins.apply("com.moowork.node")
 
