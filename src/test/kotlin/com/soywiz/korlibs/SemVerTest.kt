@@ -1,8 +1,8 @@
 package com.soywiz.korlibs
 
 import com.soywiz.korlibs.util.*
-import org.junit.*
 import kotlin.test.*
+import kotlin.test.Test
 
 class SemVerTest {
 	@Test
