@@ -12,7 +12,7 @@ fun Project.configureTargetJavaScript() {
 	//	//version = "10.16.3"
 	//}
     gkotlin.apply {
-		js(BOTH) {
+		js(IR) {
 			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
             compilations.all {
                 it.kotlinOptions.apply {
