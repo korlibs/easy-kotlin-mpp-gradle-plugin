@@ -38,9 +38,9 @@ Gingerbread         2.3.3 to 2.3.7        0.3%↑           9, 19
 			publishLibraryVariantsGroupedByFlavor = true
 			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.androidJvm)
 			compilations.all {
-				it.kotlinOptions {
-					suppressWarnings = korlibs.supressWarnings
-				}
+				it.kotlinOptions.jvmTarget = "1.8"
+				it.kotlinOptions.suppressWarnings = korlibs.supressWarnings
+				it.kotlinOptions.freeCompilerArgs = listOf("-Xno-param-assertions")
 			}
 		}
 	}
