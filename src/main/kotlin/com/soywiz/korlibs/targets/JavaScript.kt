@@ -16,7 +16,7 @@ fun Project.configureTargetJavaScript() {
 			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
             compilations.all {
                 it.kotlinOptions.apply {
-                    languageVersion = "1.4"
+                    languageVersion = "1.5"
                     sourceMap = true
                     metaInfo = true
                     moduleKind = "umd"
