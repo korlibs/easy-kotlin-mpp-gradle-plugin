@@ -5,21 +5,18 @@ buildscript {
         maven { url = uri("https://plugins.gradle.org/m2/") }
     }
     dependencies {
-        classpath("com.gradle.publish:plugin-publish-plugin:0.13.0")
+        classpath("com.gradle.publish:plugin-publish-plugin:$gradlePublishPluginVersion")
 		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-		//classpath("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:$kotlinVersion")
     }
 }
 
 plugins {
     id "java-gradle-plugin"
-	//id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
 
 apply plugin: "com.gradle.plugin-publish"
 apply plugin: "kotlin"
-//apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
@@ -55,11 +52,11 @@ if (signingSecretKeyRingFile != null || signingKey != null) {
 }
 
 dependencies {
-    testImplementation("junit:junit:4.13.2")
+    testImplementation("junit:junit:$junitVersion")
 	testImplementation("org.jetbrains.kotlin:kotlin-test")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
-	implementation("com.android.tools.build:gradle:4.2.0-rc01")
+	implementation("com.android.tools.build:gradle:$androidToolsBuildGradleVersion")
 	implementation(gradleApi())
 	implementation(localGroovy())
 }
