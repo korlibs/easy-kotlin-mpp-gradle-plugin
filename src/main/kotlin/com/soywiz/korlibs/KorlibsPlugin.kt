@@ -142,7 +142,15 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val KORLIBS_KOTLIN_VERSION get() = com.soywiz.korlibs.KORLIBS_KOTLIN_VERSION
 	val isKotlinDev get() = KORLIBS_KOTLIN_VERSION.contains("-release")
 	val isKotlinEap get() = KORLIBS_KOTLIN_VERSION.contains("-eap") || KORLIBS_KOTLIN_VERSION.contains("-M") || KORLIBS_KOTLIN_VERSION.contains("-rc")
-	val LINUX_DESKTOP_NATIVE_TARGETS = if (linuxEnabled) setOf("linuxX64") else setOf()
+	val LINUX_DESKTOP_NATIVE_TARGETS: Set<String> = LinkedHashSet<String>().apply {
+		if (linuxEnabled) {
+			add("linuxX64")
+			if (linuxArmEnabled) {
+				add("linuxArm32Hfp")
+				add("linuxArm64")
+			}
+		}
+	}
     val MACOS_DESKTOP_NATIVE_TARGETS = setOf("macosX64")
     //val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64", "mingwX86")
     val WINDOWS_DESKTOP_NATIVE_TARGETS = setOf("mingwX64")
