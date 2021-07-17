@@ -125,6 +125,7 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
 	val nodejsEnabled = !nodejsDisabled
 	val tvosEnabled = !tvosDisabled
 	val watchosEnabled = !watchosDisabled
+	val linuxArmEnabled = listOf(project, rootProject).mapNotNull { it.findProperty("enable.linuxarm") }.firstOrNull() == "true"
 	val supressWarnings = project.findProperty("kotlinSupressWarnings")?.toString()?.toBoolean() ?: true
 	val javascriptDisabled = (project.findProperty("disable.javascript") == "true") || (System.getenv("DISABLE_JAVASCRIPT") == "true")
 	val javascriptEnabled = !javascriptDisabled

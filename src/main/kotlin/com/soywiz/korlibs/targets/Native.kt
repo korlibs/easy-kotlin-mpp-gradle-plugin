@@ -67,6 +67,14 @@ fun Project.configureTargetNative() {
 			linuxX64() {
 				extraNative()
 			}
+			if (korlibs.linuxArmEnabled) {
+				linuxArm32Hfp() {
+					extraNative()
+				}
+				linuxArm64() {
+					extraNative()
+				}
+			}
 		}
 		mingwX64() {
 			extraNative()
@@ -93,6 +101,10 @@ fun Project.configureTargetNative() {
 				else -> run {
 					if (linuxEnabled) {
 						linuxX64("nativeCommon"); linuxX64("nativePosix")
+						if (korlibs.linuxArmEnabled) {
+							linuxArm32Hfp("nativeCommon"); linuxArm32Hfp("nativePosix")
+							linuxArm64("nativeCommon"); linuxArm64("nativePosix")
+						}
 					}
 				}
 			}
