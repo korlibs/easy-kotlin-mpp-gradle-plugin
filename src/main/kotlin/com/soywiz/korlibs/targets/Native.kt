@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.gradle.targets.native.tasks.*
 val linuxEnabled by lazy {
 	!Os.isFamily(Os.FAMILY_MAC) && !Os.isFamily(Os.FAMILY_WINDOWS)
 }
-val isArm get() = listOf("arm", "arm64", "aarch64").any { org.apache.tools.ant.taskdefs.condition.Os.isArch(it) }
+val isArm get() = listOf("arm", "arm64", "aarch64").any { Os.isArch(it) }
 
 fun Project.configureTargetNative() {
 	val nativeExtraJar = tasks.create<Jar>("nativeExtraJar") {
@@ -108,9 +108,9 @@ fun Project.configureTargetNative() {
 			when {
 				Os.isFamily(Os.FAMILY_WINDOWS) -> run { mingwX64("nativeCommon"); mingwX64("nativePosix") }
 				Os.isFamily(Os.FAMILY_MAC) -> if (isArm) run {
-                    macosArm64("nativeCommon"); macosArm64("nativePosix")
+					macosArm64("nativeCommon"); macosArm64("nativePosix")
 				} else run {
-                    macosX64("nativeCommon"); macosX64("nativePosix")
+					macosX64("nativeCommon"); macosX64("nativePosix")
 				}
 				else -> run {
 					if (linuxEnabled) {
