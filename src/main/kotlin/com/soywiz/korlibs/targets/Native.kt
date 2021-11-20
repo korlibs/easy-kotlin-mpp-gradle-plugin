@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.gradle.targets.native.tasks.*
 val linuxEnabled by lazy {
 	!Os.isFamily(Os.FAMILY_MAC) && !Os.isFamily(Os.FAMILY_WINDOWS)
 }
+val isArm get() = listOf("arm", "arm64", "aarch64").any { org.apache.tools.ant.taskdefs.condition.Os.isArch(it) }
 
 fun Project.configureTargetNative() {
 	val nativeExtraJar = tasks.create<Jar>("nativeExtraJar") {
@@ -38,6 +39,9 @@ fun Project.configureTargetNative() {
 		iosArm64() {
 			extraNative()
 		}
+		iosSimulatorArm64() {
+			extraNative()
+		}
 		/////////////////////////////////////////
 		if (korlibs.tvosEnabled) {
 			tvosX64() {
@@ -58,9 +62,15 @@ fun Project.configureTargetNative() {
 			watchosArm64() {
 				extraNative()
 			}
+			watchosSimulatorArm64() {
+				extraNative()
+			}
 		}
 		/////////////////////////////////////////
 		macosX64() {
+			extraNative()
+		}
+		macosArm64() {
 			extraNative()
 		}
 		if (linuxEnabled) {
@@ -97,7 +107,11 @@ fun Project.configureTargetNative() {
 		if (System.getProperty("idea.version") != null) {
 			when {
 				Os.isFamily(Os.FAMILY_WINDOWS) -> run { mingwX64("nativeCommon"); mingwX64("nativePosix") }
-				Os.isFamily(Os.FAMILY_MAC) -> run { macosX64("nativeCommon"); macosX64("nativePosix") }
+				Os.isFamily(Os.FAMILY_MAC) -> if (isArm) run {
+                    macosArm64("nativeCommon"); macosArm64("nativePosix")
+				} else run {
+                    macosX64("nativeCommon"); macosX64("nativePosix")
+				}
 				else -> run {
 					if (linuxEnabled) {
 						linuxX64("nativeCommon"); linuxX64("nativePosix")
