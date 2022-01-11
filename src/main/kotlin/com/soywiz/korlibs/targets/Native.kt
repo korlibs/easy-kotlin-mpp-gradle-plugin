@@ -133,6 +133,7 @@ fun Project.configureTargetNative() {
 			if (korlibs.NATIVE_POSIX_NON_APPLE_TARGETS.isNotEmpty()) {
 				dependants("nativePosixNonApple", korlibs.NATIVE_POSIX_NON_APPLE_TARGETS)
 			}
+			dependants("mingwCommon", korlibs.WINDOWS_DESKTOP_NATIVE_TARGETS)
 			dependants("nativePosixApple", korlibs.NATIVE_POSIX_APPLE_TARGETS)
 			dependants("iosCommon", korlibs.IOS_TARGETS)
 			dependants("tvosCommon", korlibs.TVOS_TARGETS)
