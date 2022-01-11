@@ -56,7 +56,12 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
-	implementation("com.android.tools.build:gradle:$androidToolsBuildGradleVersion")
+	// For Java8 and Java9
+	if (System.getProperty("java.version").startsWith("1.8") || System.getProperty("java.version").startsWith("9")) {
+		implementation("com.android.tools.build:gradle:$androidToolsBuildGradleVersionJava8")
+	} else {
+		implementation("com.android.tools.build:gradle:$androidToolsBuildGradleVersion")
+	}
 	implementation("com.google.code.gson:gson:$gsonVersion")
 	implementation(gradleApi())
 	implementation(localGroovy())
