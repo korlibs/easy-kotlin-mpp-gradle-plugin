@@ -16,16 +16,15 @@ fun Project.configureTargetJavaScript() {
 			this.attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
             compilations.all {
                 it.kotlinOptions.apply {
-                    languageVersion = "1.5"
                     sourceMap = true
                     metaInfo = true
                     moduleKind = "umd"
 					suppressWarnings = korlibs.supressWarnings
                 }
             }
-            mavenPublication(Action { publication ->
+            mavenPublication { publication ->
                 //println("JS publication: $publication : ${publication.name}")
-            })
+            }
             browser {
                 testTask {
 					useKarma {
@@ -67,7 +66,6 @@ fun Project.configureTargetJavaScript() {
 			targetTestTask.dependsOn(taskName)
 		}
 	}
-
 
 	dependencies.apply {
         add("jsMainImplementation", "org.jetbrains.kotlin:kotlin-stdlib-js")

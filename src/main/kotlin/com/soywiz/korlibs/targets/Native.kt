@@ -50,6 +50,9 @@ fun Project.configureTargetNative() {
 			tvosArm64() {
 				extraNative()
 			}
+			tvosSimulatorArm64() {
+				extraNative()
+			}
 		}
 		/////////////////////////////////////////
 		if (korlibs.watchosEnabled) {
