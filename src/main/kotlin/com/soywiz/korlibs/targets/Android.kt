@@ -9,10 +9,8 @@ fun Project.configureTargetAndroid() {
 	extensions.getByType(com.android.build.gradle.LibraryExtension::class.java).apply {
 		compileSdkVersion(project.findProperty("android.compile.sdk.version")?.toString()?.toIntOrNull() ?: 30)
 		buildToolsVersion(project.findProperty("android.buildtools.version")?.toString() ?: "30.0.2")
-		defaultConfig {
-			minSdkVersion(project.findProperty("android.min.sdk.version")?.toString()?.toIntOrNull() ?: 16) // Previously 18
-			targetSdkVersion(project.findProperty("android.target.sdk.version")?.toString()?.toIntOrNull() ?: 28)
-		}
+		defaultConfig.minSdkVersion(project.findProperty("android.min.sdk.version")?.toString()?.toIntOrNull() ?: 16) // Previously 18
+		defaultConfig.targetSdkVersion(project.findProperty("android.target.sdk.version")?.toString()?.toIntOrNull() ?: 28)
 	}
 
 /*
