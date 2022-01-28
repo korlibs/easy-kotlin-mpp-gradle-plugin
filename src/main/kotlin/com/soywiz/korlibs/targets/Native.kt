@@ -59,6 +59,9 @@ fun Project.configureTargetNative() {
 			watchosX86() {
 				extraNative()
 			}
+			watchosX64() {
+				extraNative()
+			}
 			watchosArm32() {
 				extraNative()
 			}
